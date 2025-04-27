@@ -183,13 +183,13 @@ int main()
 
 
 	Model escritorio((char*)"Models/mesanueva/model.obj");
-	Model tele((char*)"Models/tele/pizarron.obj");
+	Model tele((char*)"Models/Tele/Tele.obj");
 	Model tecladoled((char*)"Models/Led_Teclado/Teclado.obj");
-	//Model silla2((char*)"Models/tele/pizarron.obj");
-	//Model monitor2((char*)"Models/tele/pizarron.obj");
-	//Model LucesLed((char*)"Models/tele/pizarron.obj");
-	//Model	neon((char*)"Models/tele/pizarron.obj");
-
+	Model silla2((char*)"Models/GamerChair/GamerChair.obj");
+	Model moniGamer((char*)"Models/MonitorNew/model.obj");
+	Model servidor((char*)"Models/Rack/model.obj");
+	
+	Model prueba((char*)"Models/Pruebas/model.obj");
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
 	glGenVertexArrays(1, &VAO);
@@ -384,6 +384,7 @@ int main()
 		glm::mat4 pivotecompus = glm::mat4(1.0f); //Temp
 		glm::mat4 pTeclado = glm::mat4(1.0f); //Temp
 		glm::mat4 CPUpiv = glm::mat4(1.0f); //Temp
+		glm::mat4 Rackpiv = glm::mat4(1.0f); //Temp
 
 		glm::mat4 model(1);
 		glm::mat4 model1(1);
@@ -401,17 +402,19 @@ int main()
 		glm::mat4 CU = glm::mat4(1);
 		glm::mat4 pizarron = glm::mat4(1);
 		glm::mat4 puerta = glm::mat4(1);
-
+		glm::mat4 rack = glm::mat4(1.0f);
 		glm::mat4 luna = glm::mat4(1);
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+		//model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
 
 		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(-1.0f, -1.0f, 0.0f));
 		//glUniformMatrix4fv(glGetUniformLocation(lightingShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Salon.Draw(lightingShader);
+		/*prueba.Draw(lightingShader);*/
 	
 		if(!nuevo){
 		pizarron = model;
@@ -904,10 +907,9 @@ int main()
 	}
 	else {
 		pizarron = model;
-		pizarron = glm::scale(pizarron, glm::vec3(0.002f, 0.002f, 0.002f));
-		pizarron = glm::translate(pizarron, glm::vec3(35.0f, -3.0f, -125.0f));
+		pizarron = glm::scale(pizarron, glm::vec3(0.012f, 0.012f, 0.012f));
 		pizarron = glm::rotate(pizarron, glm::radians(0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-		pizarron = glm::translate(pizarron, glm::vec3(-10.0f, 0.0f, 40.0f));
+		pizarron = glm::translate(pizarron, glm::vec3(6.5f, 1.0f, -12.5f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
@@ -986,166 +988,170 @@ int main()
 		escritorio.Draw(lightingShader);
 
 
+		float fSn1 = -1.0f;
+		float fSn2 = 3.0f;
+		float fSn3 = 7.0f;
 
+		
 		pivotesillas = model;
-		pivotesillas = glm::scale(pivotesillas, glm::vec3(0.0015f, 0.0015f, 0.0015f));
-		pivotesillas = glm::translate(pivotesillas, glm::vec3(12.0f, 0.0f, 28.0f));
+		pivotesillas = glm::scale(pivotesillas, glm::vec3(0.015f, 0.015f, 0.015f));
+		pivotesillas = glm::translate(pivotesillas, glm::vec3(0.0f, 0.0f, 0.0f));
 		pivotesillas = glm::rotate(pivotesillas, glm::radians(90.0f), glm::vec3(.00f, -1.0f, 0.0f));
 		//delante izq
 
-		model2 = glm::translate(pivotesillas, glm::vec3(-20.0f, 0.0f, 60.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn1, 0.0f, 6.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
-		model2 = glm::translate(pivotesillas, glm::vec3(-20.0f, 0.0f, 50.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn1, 0.0f, 5.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
-		model2 = glm::translate(pivotesillas, glm::vec3(-20.0f, 0.0f, 32.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn1, 0.0f, 3.2f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
-		model2 = glm::translate(pivotesillas, glm::vec3(-20.0f, 0.0f, 22.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn1, 0.0f, 2.2f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
 		//centro izq
-		model2 = glm::translate(pivotesillas, glm::vec3(20.0f, 0.0f, 60.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn2, 0.0f, 6.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
-		model2 = glm::translate(pivotesillas, glm::vec3(20.0f, 0.0f, 50.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn2, 0.0f, 5.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
+		
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn2, 0.0f, 3.2f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
+		silla2.Draw(lightingShader);
 
-		model2 = glm::translate(pivotesillas, glm::vec3(20.0f, 0.0f, 32.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn2, 0.0f, 2.2f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
-
-		model2 = glm::translate(pivotesillas, glm::vec3(20.0f, 0.0f, 22.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
 
 		//atras izq
-		model2 = glm::translate(pivotesillas, glm::vec3(60.0f, 0.0f, 60.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn3, 0.0f, 6.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
-		model2 = glm::translate(pivotesillas, glm::vec3(60.0f, 0.0f, 50.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn3, 0.0f, 5.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
-		model2 = glm::translate(pivotesillas, glm::vec3(60.0f, 0.0f, 32.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn3, 0.0f, 3.2f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
-		model2 = glm::translate(pivotesillas, glm::vec3(60.0f, 0.0f, 22.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn3, 0.0f, 2.2f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 		glBindVertexArray(0);
 
 
 		//delante der
 
-		model2 = glm::translate(pivotesillas, glm::vec3(-20.0f, 0.0f, -50.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn1, 0.0f, -5.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
-		model2 = glm::translate(pivotesillas, glm::vec3(-20.0f, 0.0f, -40.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn1, 0.0f, -4.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
-		model2 = glm::translate(pivotesillas, glm::vec3(-20.0f, 0.0f, -25.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn1, 0.0f, -2.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
-		model2 = glm::translate(pivotesillas, glm::vec3(-20.0f, 0.0f, -15.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn1, 0.0f, -1.5f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
 		//centro der
-		model2 = glm::translate(pivotesillas, glm::vec3(20.0f, 0.0f, -50.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn2, 0.0f, -5.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
-		model2 = glm::translate(pivotesillas, glm::vec3(20.0f, 0.0f, -40.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn2, 0.0f, -4.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
-		model2 = glm::translate(pivotesillas, glm::vec3(20.0f, 0.0f, -25.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn2, 0.0f, -2.5f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
-		model2 = glm::translate(pivotesillas, glm::vec3(20.0f, 0.0f, -15.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn2, 0.0f, -1.5f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
 
 		//atras der
-		model2 = glm::translate(pivotesillas, glm::vec3(60.0f, 0.0f, -50.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn3, 0.0f, -5.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
-		model2 = glm::translate(pivotesillas, glm::vec3(60.0f, 0.0f, -40.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn3, 0.0f, -4.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
-		model2 = glm::translate(pivotesillas, glm::vec3(60.0f, 0.0f, -25.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn3, 0.0f, -2.5f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 
-		model2 = glm::translate(pivotesillas, glm::vec3(60.0f, 0.0f, -15.0f));
+		model2 = glm::translate(pivotesillas, glm::vec3(fSn3, 0.0f, -1.5f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
-		silla.Draw(lightingShader);
+		silla2.Draw(lightingShader);
 		glBindVertexArray(0);
 
 
@@ -1155,38 +1161,42 @@ int main()
 		pivotesillas = glm::rotate(pivotesillas, glm::radians(90.0f), glm::vec3(.00f, -1.0f, 0.0f));*/
 
 		pivotecompus = model;
-		pivotecompus = glm::scale(pivotecompus, glm::vec3(0.0015f, 0.0015f, 0.0015f));
-		pivotecompus = glm::translate(pivotecompus, glm::vec3(50.0f, 0.0f, 20.0f));
+		pivotecompus = glm::scale(pivotecompus, glm::vec3(0.0010f, 0.0010f, 0.0010f));
+		pivotecompus = glm::translate(pivotecompus, glm::vec3(0.0f, 21.0f, 0.0f));
 
-		float filaa = -40.0f;
-		float filab = 0.0f;
-		float filac = 40.0f;
+		float filaa = -30.5f;
+		float filab = 24.0f;
+		float filac = 85.0f;
 
+		float colca = -81.0f;
+		float colcb = -40.0f;
+		float colcc = 37.0f;
+		float colcd = 76.0f;
 		pTeclado = pivotecompus;
-		pTeclado = glm::translate(pTeclado, glm::vec3(-50.0f, 14.0f, -20.0f));
-		pTeclado = glm::scale(pTeclado, glm::vec3(0.25f, 0.25f, 0.25f));
+		pTeclado = glm::translate(pTeclado, glm::vec3(0.0f, 0.0f, 0.0f));
+		pTeclado = glm::scale(pTeclado, glm::vec3(0.375f, 0.375f, 0.375f));
 
 		/*CPUpiv = pivotecompus;
 		CPUpiv = glm::translate(CPUpiv, glm::vec3(-50.0f, 17.0f, 0.0f));
 		CPUpiv = glm::scale(CPUpiv, glm::vec3(0.1f, 0.1f, 0.1f));*/
 
-		moni = glm::translate(pivotecompus, glm::vec3(-55, 0.0f, filaa));
+		moni = glm::translate(pivotecompus, glm::vec3(colca, 0.0f, filaa));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		monitor.Draw(lightingShader);
+		moniGamer.Draw(lightingShader);
 
-		tecla = glm::translate(pTeclado, glm::vec3(-230.0f, 0.0f, -80));
+		tecla = glm::translate(pTeclado, glm::vec3(-230.0f, 0.0f, -75));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 		///////////////
-		moni = glm::translate(pivotecompus, glm::vec3(-55, 0.0f, filab));
+		moni = glm::translate(pivotecompus, glm::vec3(colca, 0.0f, filab));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		monitor.Draw(lightingShader);
+		moniGamer.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(-230, 0.0f,80));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
@@ -1195,11 +1205,11 @@ int main()
 		tecladoled.Draw(lightingShader);
 
 		///////////////////////
-		moni = glm::translate(pivotecompus, glm::vec3(-55, 0.0f, filac));
+		moni = glm::translate(pivotecompus, glm::vec3(colca, 0.0f, filac));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		monitor.Draw(lightingShader);
+		moniGamer.Draw(lightingShader);
 		tecla = glm::translate(pTeclado, glm::vec3(-230, 0.0f,240));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1207,34 +1217,34 @@ int main()
 		tecladoled.Draw(lightingShader);
 		///////////////////
 
-		moni = glm::translate(pivotecompus, glm::vec3(-30, 0.0f, filaa));
+		moni = glm::translate(pivotecompus, glm::vec3(colcb, 0.0f, filaa));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		monitor.Draw(lightingShader);
-		tecla = glm::translate(pTeclado, glm::vec3(-115, 0.0f, -80));
+		moniGamer.Draw(lightingShader);
+		tecla = glm::translate(pTeclado, glm::vec3(-115, 0.0f, -75));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 
 		/////////////////
-		moni = glm::translate(pivotecompus, glm::vec3(-30, 0.0f, filab));
+		moni = glm::translate(pivotecompus, glm::vec3(colcb, 0.0f, filab));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		monitor.Draw(lightingShader);
+		moniGamer.Draw(lightingShader);
 		tecla = glm::translate(pTeclado, glm::vec3(-115, 0.0f, 80));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 		///////////////
-		moni = glm::translate(pivotecompus, glm::vec3(-30, 0.0f, filac));
+		moni = glm::translate(pivotecompus, glm::vec3(colcb, 0.0f, filac));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		monitor.Draw(lightingShader);
+		moniGamer.Draw(lightingShader);
 		tecla = glm::translate(pTeclado, glm::vec3(-115, 0.0f, 240));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1279,56 +1289,56 @@ int main()
 		//cpu.Draw(lightingShader);
 
 		//////////////
-		moni = glm::translate(pivotecompus, glm::vec3(45, 0.0f, filaa));
+		moni = glm::translate(pivotecompus, glm::vec3(colcd, 0.0f, filaa));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		monitor.Draw(lightingShader);
-		tecla = glm::translate(pTeclado, glm::vec3(200, 0.0f, -80));
+		moniGamer.Draw(lightingShader);
+		tecla = glm::translate(pTeclado, glm::vec3(200, 0.0f, -75));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 		////////////////////////
-		moni = glm::translate(pivotecompus, glm::vec3(45, 0.0f, filab));
+		moni = glm::translate(pivotecompus, glm::vec3(colcd, 0.0f, filab));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		monitor.Draw(lightingShader);
+		moniGamer.Draw(lightingShader);
 		tecla = glm::translate(pTeclado, glm::vec3(200, 0.0f, 80));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 		///////////////////////
-		moni = glm::translate(pivotecompus, glm::vec3(45, 0.0f, filac));
+		moni = glm::translate(pivotecompus, glm::vec3(colcd, 0.0f, filac));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		monitor.Draw(lightingShader);
+		moniGamer.Draw(lightingShader);
 		tecla = glm::translate(pTeclado, glm::vec3(200, 0.0f, 240));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 		////////////////////////
-		moni = glm::translate(pivotecompus, glm::vec3(17, 0.0f, filaa));
+		moni = glm::translate(pivotecompus, glm::vec3(colcc, 0.0f, filaa));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		monitor.Draw(lightingShader);
-		tecla = glm::translate(pTeclado, glm::vec3(90, 0.0f, -80));
+		moniGamer.Draw(lightingShader);
+		tecla = glm::translate(pTeclado, glm::vec3(90, 0.0f, -75));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 
 		////////////////////////
-		moni = glm::translate(pivotecompus, glm::vec3(17, 0.0f, filab));
+		moni = glm::translate(pivotecompus, glm::vec3(colcc, 0.0f, filab));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		monitor.Draw(lightingShader);
+		moniGamer.Draw(lightingShader);
 		tecla = glm::translate(pTeclado, glm::vec3(90, 0.0f, 80));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1336,11 +1346,11 @@ int main()
 		tecladoled.Draw(lightingShader);
 
 		///////////////////////////////
-		moni = glm::translate(pivotecompus, glm::vec3(17, 0.0f, filac));
+		moni = glm::translate(pivotecompus, glm::vec3(colcc, 0.0f, filac));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		monitor.Draw(lightingShader);
+		moniGamer.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(90, 0.0f, 240));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
@@ -1348,6 +1358,21 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 		/////////////////////////
+		//Rackpiv = model;
+		//Rackpiv = glm::scale(Rackpiv, glm::vec3(0.0015f, 0.0015f, 0.0015f));
+		rack = model;
+		
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(rack));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		rack = glm::scale(rack, glm::vec3(0.05f, 0.05f, 0.05f));
+		rack = glm::translate(rack, glm::vec3(0.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(rack));
+		servidor.Draw(lightingShader);
+		glBindVertexArray(0);
+
+		
+		
+	
 
 		//////////cpus de mesa de adelante
 		//CU = glm::translate(CPUpiv, glm::vec3(11.0f * 10, 0.0f, -14.0f * 10));
@@ -1385,6 +1410,7 @@ int main()
 		//glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 		//cpu.Draw(lightingShader);
+
 
 	}
 
