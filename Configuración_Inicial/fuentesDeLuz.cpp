@@ -124,6 +124,192 @@ float vertices[] = {
 
 glm::vec3 Light1 = glm::vec3(0);
 
+//////////////////////////////////// INICIO FRAMES ///////////////////////////////
+//Anim
+float rotBall = 0.0f;
+float rotDog = 0.0f;
+float rotDogX = 0; //Variable para rotación
+int dogAnim = 0;
+float FLegs = 0.0f;
+float FLegsL = 0.0f;
+float FLegsR = 0.0f;
+float RLegs = 0.0f;
+float head = 0.0f;
+float tail = 0.0f;
+
+float radio = 0.0f;  // Radio del círculo
+float angle = 0.0f;  // Ángulo inicial
+bool moveRot = false;
+float speed = 0.0001f;
+
+
+//Modificar estos KeyFrames pues es para cada animación
+float dogPosX, dogPosY, dogPosZ;
+
+#define MAX_FRAMES 9
+int i_max_steps = 500;
+int i_curr_steps = 0;
+
+//-----------------------Definición de la estructura para los KeyFrames-----------------------
+typedef struct _frame {
+
+	float rotDog;
+	float rotDogInc;
+	float dogPosX;
+	float dogPosY;
+	float dogPosZ;
+	float incX;
+	float incY;
+	float incZ;
+	float head;
+	float headInc;
+	float tail;
+	float tailInc;
+	float FLegs;
+	float FLegsInc;
+	float FLegsL;
+	float FLegsLInc;
+	float FLegsR;
+	float FLegsRInc;
+	float RLegs;
+	float RLegsInc;
+	//Variables para la rotación
+	float rotDogX;
+	float rotDogXInc;
+
+}FRAME;
+
+FRAME KeyFrame[MAX_FRAMES];
+int FrameIndex = 0;			//En qué lugar de la línea de tiempo me encuentro al guardar los datos
+bool play = false;			//Si se está reproduciendo la animación
+int playIndex = 0;			//En qué lugar de la línea de tiempo me encuentro al estar reproduciendo la animación
+
+// Función para guardar la animación
+void SaveAnimation(const char* filename = "Animacion.txt") {
+	std::ofstream file(filename);
+	if (!file.is_open()) {
+		std::cerr << "Error al abrir el archivo para guardar." << std::endl;
+		return;
+	}
+
+	for (int i = 0; i < FrameIndex; i++) {
+		file << KeyFrame[i].dogPosX << " "
+			<< KeyFrame[i].dogPosY << " "
+			<< KeyFrame[i].dogPosZ << " "
+			<< KeyFrame[i].rotDog << " "
+			<< KeyFrame[i].head << " "
+			<< KeyFrame[i].tail << " "
+			<< KeyFrame[i].FLegs << " "
+			<< KeyFrame[i].FLegsL << " "
+			<< KeyFrame[i].FLegsR << " "
+			<< KeyFrame[i].RLegs << " "
+			<< KeyFrame[i].rotDogX << "\n";
+	}
+	file.close();
+	std::cout << "Animacion guardada correctamente." << std::endl;
+}
+
+// Función para cargar los KeyFrames
+void LoadAnimation(const char* filename = "Animacion.txt") {
+	std::ifstream file(filename);
+	if (!file.is_open()) {
+		std::cerr << "Error al abrir el archivo para cargar." << std::endl;
+		return;
+	}
+
+	FrameIndex = 0;
+	while (FrameIndex < MAX_FRAMES &&
+		file >> KeyFrame[FrameIndex].dogPosX
+		>> KeyFrame[FrameIndex].dogPosY
+		>> KeyFrame[FrameIndex].dogPosZ
+		>> KeyFrame[FrameIndex].rotDog
+		>> KeyFrame[FrameIndex].head
+		>> KeyFrame[FrameIndex].tail
+		>> KeyFrame[FrameIndex].FLegs
+		>> KeyFrame[FrameIndex].FLegsL
+		>> KeyFrame[FrameIndex].FLegsR
+		>> KeyFrame[FrameIndex].RLegs
+		>> KeyFrame[FrameIndex].rotDogX) {
+		FrameIndex++;
+	}
+}
+
+// Función para imprimir el contenido del archivo .txt en consola
+void PrintAnimation(const char* filename = "Animacion.txt") {
+	std::ifstream file(filename);
+	if (!file.is_open()) {
+		std::cerr << "Error al abrir el archivo para imprimir." << std::endl;
+		return;
+	}
+
+	std::string line;
+	std::cout << "Contenido del archivo " << filename << ":\n";
+	while (std::getline(file, line)) {
+		std::cout << line << std::endl;
+	}
+	file.close();
+}
+
+void saveFrame(void)
+{
+
+	printf("frameindex %d\n", FrameIndex);
+
+	KeyFrame[FrameIndex].dogPosX = dogPosX;
+	KeyFrame[FrameIndex].dogPosY = dogPosY;
+	KeyFrame[FrameIndex].dogPosZ = dogPosZ;
+
+	KeyFrame[FrameIndex].rotDog = rotDog;
+	KeyFrame[FrameIndex].rotDogX = rotDogX;
+
+	KeyFrame[FrameIndex].head = head;
+	KeyFrame[FrameIndex].tail = tail;
+	KeyFrame[FrameIndex].FLegs = FLegs;
+	KeyFrame[FrameIndex].FLegsL = FLegsL;
+	KeyFrame[FrameIndex].FLegsR = FLegsR;
+	KeyFrame[FrameIndex].RLegs = RLegs;
+
+	FrameIndex++;
+}
+
+void resetElements(void)
+{
+	dogPosX = KeyFrame[0].dogPosX;
+	dogPosY = KeyFrame[0].dogPosY;
+	dogPosZ = KeyFrame[0].dogPosZ;
+
+	head = KeyFrame[0].head;
+	tail = KeyFrame[0].tail;
+	FLegs = KeyFrame[0].FLegs;
+	FLegsL = KeyFrame[0].FLegsL;
+	FLegsR = KeyFrame[0].FLegsR;
+	RLegs = KeyFrame[0].RLegs;
+
+	rotDog = KeyFrame[0].rotDog;
+	rotDogX = KeyFrame[0].rotDogX;
+
+}
+void interpolation(void)
+{
+
+	KeyFrame[playIndex].incX = (KeyFrame[playIndex + 1].dogPosX - KeyFrame[playIndex].dogPosX) / i_max_steps;
+	KeyFrame[playIndex].incY = (KeyFrame[playIndex + 1].dogPosY - KeyFrame[playIndex].dogPosY) / i_max_steps;
+	KeyFrame[playIndex].incZ = (KeyFrame[playIndex + 1].dogPosZ - KeyFrame[playIndex].dogPosZ) / i_max_steps;
+
+	KeyFrame[playIndex].headInc = (KeyFrame[playIndex + 1].head - KeyFrame[playIndex].head) / i_max_steps;
+	KeyFrame[playIndex].tailInc = (KeyFrame[playIndex + 1].tail - KeyFrame[playIndex].tail) / i_max_steps;
+	KeyFrame[playIndex].FLegsInc = (KeyFrame[playIndex + 1].FLegs - KeyFrame[playIndex].FLegs) / i_max_steps;
+	KeyFrame[playIndex].FLegsLInc = (KeyFrame[playIndex + 1].FLegsL - KeyFrame[playIndex].FLegsL) / i_max_steps;
+	KeyFrame[playIndex].FLegsRInc = (KeyFrame[playIndex + 1].FLegsR - KeyFrame[playIndex].FLegsR) / i_max_steps;
+	KeyFrame[playIndex].RLegsInc = (KeyFrame[playIndex + 1].RLegs - KeyFrame[playIndex].RLegs) / i_max_steps;
+
+	KeyFrame[playIndex].rotDogInc = (KeyFrame[playIndex + 1].rotDog - KeyFrame[playIndex].rotDog) / i_max_steps;
+	KeyFrame[playIndex].rotDogXInc = (KeyFrame[playIndex + 1].rotDogX - KeyFrame[playIndex].rotDogX) / i_max_steps;
+
+	printf("Interpolando cuadro %d a %d: IncX = %f\n", playIndex, playIndex + 1, KeyFrame[playIndex].incX);
+}
+//////////////////////////////////// FIN FRAMES ///////////////////////////////
+
 int main()
 {
 	// Init GLFW
@@ -195,6 +381,78 @@ int main()
 	Model servidor((char*)"Models/Rack/model.obj");
 	
 	Model prueba((char*)"Models/Pruebas/model.obj");
+
+	////////////////////////// KEYFRAMES //////////////////////////////////
+
+   /*Iniciarlizar todos los frames en 0 */
+   //KeyFrames
+	for (int i = 0; i < MAX_FRAMES; i++)
+	{
+
+		KeyFrame[i].dogPosX = 0;
+		KeyFrame[i].dogPosY = 0;
+		KeyFrame[i].dogPosZ = 0;
+		KeyFrame[i].incX = 0;
+		KeyFrame[i].incY = 0;
+		KeyFrame[i].incZ = 0;
+		KeyFrame[i].rotDog = 0;
+		KeyFrame[i].rotDogInc = 0;
+		KeyFrame[i].tail = 0;
+		KeyFrame[i].tailInc = 0;
+		KeyFrame[i].FLegs = 0;
+		KeyFrame[i].FLegsInc = 0;
+		KeyFrame[i].FLegsL = 0;
+		KeyFrame[i].FLegsLInc = 0;
+		KeyFrame[i].FLegsR = 0;
+		KeyFrame[i].FLegsRInc = 0;
+		KeyFrame[i].RLegs = 0;
+		KeyFrame[i].RLegsInc = 0;
+		KeyFrame[i].rotDogX = 0;
+		KeyFrame[i].rotDogXInc = 0;
+		KeyFrame[i].head = 0;
+		KeyFrame[i].headInc = 0;
+	}
+
+	//for (int i = 0; i < MAX_FRAMES_BOY; i++)
+	//{
+	//	//----------BOY------------
+
+	//	KeyFrameBoy[i].boyPosX = 0;
+	//	KeyFrameBoy[i].boyPosY = 0;
+	//	KeyFrameBoy[i].boyPosZ = 0;
+
+	//	KeyFrameBoy[i].sktPosX = 0;
+	//	KeyFrameBoy[i].sktPosY = 0;
+	//	KeyFrameBoy[i].sktPosZ = 0;
+
+	//	KeyFrameBoy[i].rotBoy = 0;
+	//	KeyFrameBoy[i].rotBoyInc = 0;
+	//	KeyFrameBoy[i].rotBoyX = 0;
+	//	KeyFrameBoy[i].rotBoyXInc = 0;
+
+	//	KeyFrameBoy[i].cuerpoBoy = 0;
+	//	KeyFrameBoy[i].cuerpoBoyInc = 0;
+	//	KeyFrameBoy[i].bicepDer = 0;
+	//	KeyFrameBoy[i].bicepDerInc = 0;
+	//	KeyFrameBoy[i].bicepIzq = 0;
+	//	KeyFrameBoy[i].bicepIzqInc = 0;
+	//	KeyFrameBoy[i].brazoDer = 0;
+	//	KeyFrameBoy[i].brazoDerInc = 0;
+	//	KeyFrameBoy[i].brazoIzq = 0;
+	//	KeyFrameBoy[i].brazoIzqInc = 0;
+	//	KeyFrameBoy[i].piernaDer = 0;
+	//	KeyFrameBoy[i].piernaDerInc = 0;
+	//	KeyFrameBoy[i].piernaIzq = 0;
+	//	KeyFrameBoy[i].piernaIzqInc = 0;
+	//	KeyFrameBoy[i].pantDer = 0;
+	//	KeyFrameBoy[i].pantDerInc = 0;
+	//	KeyFrameBoy[i].pantIzq = 0;
+	//	KeyFrameBoy[i].pantIzqInc = 0;
+
+	//}
+
+	//////////////////////////////////// FIN KEYFRAMES ///////////////////////////////
+	
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
 	glGenVertexArrays(1, &VAO);
@@ -1625,6 +1883,46 @@ void DoMovement()
 // Is called whenever a key is pressed/released via GLFW
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode)
 {
+	if (key == GLFW_KEY_L && GLFW_PRESS == action)
+	{
+		if (play == false && (FrameIndex > 1))
+		{
+
+			resetElements();
+			//First Interpolation				
+			interpolation();
+
+			play = true;
+			playIndex = 0;
+			i_curr_steps = 0;
+		}
+		else
+		{
+			play = false;
+		}
+
+	}
+
+	if (key == GLFW_KEY_K && GLFW_PRESS == action)
+	{
+		if (FrameIndex < MAX_FRAMES)
+		{
+			saveFrame(); //Almacena cada frame
+		}
+
+	}
+
+	if (key == GLFW_KEY_Q && GLFW_PRESS == action) {
+		SaveAnimation();  // Guarda la animación en "Animacion.txt"
+	}
+
+	if (key == GLFW_KEY_R && GLFW_PRESS == action) {
+
+		resetElements();  // Resetear los elementos a los primeros keyframes cargados
+		LoadAnimation(); //Carga la animación por medio del archivo previamente guardado
+		PrintAnimation(); //Imprime en terminar los valores del archivo
+	}
+
 	if (GLFW_KEY_ESCAPE == key && GLFW_PRESS == action)
 	{
 		glfwSetWindowShouldClose(window, GL_TRUE);
@@ -1640,22 +1938,49 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 		{
 			keys[key] = false;
 		}
+	}	
+}
+
+void Animation() {
+
+	if (play)
+	{
+		if (i_curr_steps >= i_max_steps) //end of animation between frames?
+		{
+			playIndex++;
+			if (playIndex > FrameIndex - 2)	//end of total animation?
+			{
+				printf("termina anim\n");
+				playIndex = 0;
+				play = false;
+			}
+			else //Next frame interpolations
+			{
+				i_curr_steps = 0; //Reset counter
+				//Interpolation
+				interpolation();
+			}
+		}
+		else
+		{
+			//Draw animation
+			dogPosX += KeyFrame[playIndex].incX;
+			dogPosY += KeyFrame[playIndex].incY;
+			dogPosZ += KeyFrame[playIndex].incZ;
+			head += KeyFrame[playIndex].headInc;
+			tail += KeyFrame[playIndex].tailInc;
+			FLegsL += KeyFrame[playIndex].FLegsLInc;
+			FLegsR += KeyFrame[playIndex].FLegsRInc;
+			RLegs += KeyFrame[playIndex].RLegsInc;
+			FLegs += KeyFrame[playIndex].FLegsInc;
+			rotDog += KeyFrame[playIndex].rotDogInc;
+			rotDogX += KeyFrame[playIndex].rotDogXInc;
+
+			i_curr_steps++;
+		}
+
 	}
 
-	//if (keys[GLFW_KEY_SPACE])
-	//{
-	//	active = !active;
-	//	if (active)
-	//	{
-	//		Light1 = glm::vec3(1.0f, 1.0f, 0.0f);
-	//	}
-	//	else
-	//	{
-	//		Light1 = glm::vec3(0);//Cuado es solo un valor en los 3 vectores pueden dejar solo una componente
-	//	}
-	//}
-
-	
 }
 
 void MouseCallback(GLFWwindow *window, double xPos, double yPos)
