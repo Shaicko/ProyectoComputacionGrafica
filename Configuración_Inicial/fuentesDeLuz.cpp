@@ -1,11 +1,12 @@
-/*
-Practica 9
-Rodriguez Garcia Javier Antonio
-319277485
-Fecha de entrega: 04/04/2025
+/* PROYECTO DE COMPUTACIÓN GRÁFICA E INTERACCIÓN HUMANO COMPUTADORA
+* SEMESTRE 2025-2
+* EQUIPO 9
+* INTEGRANTES:
+* Berdejo Guzmán Leonardo Ariel
+* Javier Antonio Rodriguez Garcia
 */
 
-
+#include <string>
 #include <iostream>
 #include <cmath>
 
@@ -17,6 +18,9 @@ Fecha de entrega: 04/04/2025
 
 // Other Libs
 #include "stb_image.h"
+
+//libreria para el skybox
+//#include "Texture.h"
 
 // GLM Mathematics
 #include <glm/glm.hpp>
@@ -36,17 +40,23 @@ Fecha de entrega: 04/04/2025
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow *window, double xPos, double yPos);
 void DoMovement();
+void Animation(); //Función para los frames 
 
 // Window dimensions
 const GLuint WIDTH = 1500, HEIGHT = 650;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // Camera
-Camera  camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera  camera(glm::vec3(0.0f, 0.0f, 5.0f));
 GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
 bool keys[1024];
 bool firstMouse = true;
+
+// Deltatime
+GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
+GLfloat lastFrame = 0.0f;  	// Time of last frame
+
 // Light attributes
 glm::vec3 lightPos(0.0f, 0.0f,5.0f);
 bool active;
@@ -114,11 +124,6 @@ float vertices[] = {
 
 glm::vec3 Light1 = glm::vec3(0);
 
-
-// Deltatime
-GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
-GLfloat lastFrame = 0.0f;  	// Time of last frame
-
 int main()
 {
 	// Init GLFW
@@ -131,7 +136,7 @@ int main()
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);*/
 
 	// Create a GLFWwindow object that we can use for GLFW's functions
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Practica 9, Javier Rodriguez, 04 / 04 / 2025, 319277485 ", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Proyecto Grafica - Laboratorio de Redes y Seguridad", nullptr, nullptr);
 
 	if (nullptr == window)
 	{
