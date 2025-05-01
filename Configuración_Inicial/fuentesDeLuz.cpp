@@ -1,8 +1,8 @@
-/* PROYECTO DE COMPUTACIÓN GRÁFICA E INTERACCIÓN HUMANO COMPUTADORA
+/* PROYECTO DE COMPUTACIï¿½N GRï¿½FICA E INTERACCIï¿½N HUMANO COMPUTADORA
 * SEMESTRE 2025-2
 * EQUIPO 9
 * INTEGRANTES:
-* Berdejo Guzmán Leonardo Ariel
+* Berdejo Guzmï¿½n Leonardo Ariel
 * Javier Antonio Rodriguez Garcia
 */
 
@@ -19,9 +19,6 @@
 // Other Libs
 #include "stb_image.h"
 
-//libreria para el skybox
-//#include "Texture.h"
-
 // GLM Mathematics
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -35,19 +32,21 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Model.h"
+#include "Texture.h"
 
 // Function prototypes
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow *window, double xPos, double yPos);
 void DoMovement();
-void Animation(); //Función para los frames 
+void MonitorAnimation();
+void Animation(); //Funciï¿½n para los frames 
 
 // Window dimensions
 const GLuint WIDTH = 1500, HEIGHT = 650;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // Camera
-Camera  camera(glm::vec3(0.0f, 0.0f, 5.0f));
+Camera camera(glm::vec3(0.0f, 0.5f, 0.0f));
 GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
 bool keys[1024];
@@ -69,7 +68,7 @@ int luz3 = 0;
 int luz4 = 0;
 int cont = 0;
 
-int nuevo = 1;
+int nuevo = 0;
 // Positions of the point lights
 glm::vec3 pointLightPositions[] = {
 	glm::vec3(0.43f,0.25f,1.6f),
@@ -126,11 +125,18 @@ float vertices[] = {
 
 glm::vec3 Light1 = glm::vec3(0);
 
+// Variables para la animaciï¿½n de monitores
+bool monitorAnimationActive = false;  // Indica si la animaciï¿½n estï¿½ activa
+int monitorAnimationState = 0;  // 0: monitores viejos, 1: transiciï¿½n, 2: monitores nuevos
+float oldMonitorScale = 1.0f;  // Escala para monitores viejos
+float newMonitorScale = 0.0f;  // Escala para monitores nuevos
+int monitorAnimFrame = 0;  // Frame actual de la animaciï¿½n
+const int MONITOR_ANIM_MAX_FRAMES = 60;  // Total de frames para cada transiciï¿½n
 //////////////////////////////////// INICIO FRAMES ///////////////////////////////
 //Anim
 float rotBall = 0.0f;
 float rotDog = 0.0f;
-float rotDogX = 0; //Variable para rotación
+float rotDogX = 0; //Variable para rotaciï¿½n
 int dogAnim = 0;
 float FLegs = 0.0f;
 float FLegsL = 0.0f;
@@ -139,8 +145,8 @@ float RLegs = 0.0f;
 float head = 0.0f;
 float tail = 0.0f;
 
-float radio = 0.0f;  // Radio del círculo
-float angle = 0.0f;  // Ángulo inicial
+float radio = 0.0f;  // Radio del cï¿½rculo
+float angle = 0.0f;  // ï¿½ngulo inicial
 bool moveRot = false;
 float speed = 0.0001f;
 
@@ -160,14 +166,14 @@ float contadorhumo9 = 0.0;
 float contadorhumo10 = 0.0;
 float rhumo = 0.0f;
 
-//Modificar estos KeyFrames pues es para cada animación
+//Modificar estos KeyFrames pues es para cada animaciï¿½n
 float dogPosX, dogPosY, dogPosZ;
 
-#define MAX_FRAMES 9
-int i_max_steps = 500;
+#define MAX_FRAMES 50
+int i_max_steps = 190;
 int i_curr_steps = 0;
 
-//-----------------------Definición de la estructura para los KeyFrames-----------------------
+//-----------------------Definiciï¿½n de la estructura para los KeyFrames-----------------------
 typedef struct _frame {
 
 	float rotDog;
@@ -190,16 +196,16 @@ typedef struct _frame {
 	float FLegsRInc;
 	float RLegs;
 	float RLegsInc;
-	//Variables para la rotación
+	//Variables para la rotaciï¿½n
 	float rotDogX;
 	float rotDogXInc;
 
 }FRAME;
 
 FRAME KeyFrame[MAX_FRAMES];
-int FrameIndex = 0;			//En qué lugar de la línea de tiempo me encuentro al guardar los datos
-bool play = false;			//Si se está reproduciendo la animación
-int playIndex = 0;			//En qué lugar de la línea de tiempo me encuentro al estar reproduciendo la animación
+int FrameIndex = 0;			//En quï¿½ lugar de la lï¿½nea de tiempo me encuentro al guardar los datos
+bool play = false;			//Si se estï¿½ reproduciendo la animaciï¿½n
+int playIndex = 0;			//En quï¿½ lugar de la lï¿½nea de tiempo me encuentro al estar reproduciendo la animaciï¿½n
 bool humoflag = false;
 //flag1
 struct Particle {
@@ -223,7 +229,7 @@ void spawnParticle(int i,float x,float y, float z, float sizehumoxz, float sizeh
 //			p.position += p.velocity * deltaTime;
 //		}
 //	}
-//	// Eliminar partículas muertas
+//	// Eliminar partï¿½culas muertas
 //	particles.erase(std::remove_if(particles.begin(), particles.end(),
 //		[](const Particle& p) { return p.life <= 0.0f; }), particles.end());
 //}
@@ -233,7 +239,7 @@ void renderParticles(glm::mat4 hum) {
 
 }
 
-// Función para guardar la animación
+// Funciï¿½n para guardar la animaciï¿½n
 void SaveAnimation(const char* filename = "Animacion.txt") {
 	std::ofstream file(filename);
 	if (!file.is_open()) {
@@ -258,7 +264,7 @@ void SaveAnimation(const char* filename = "Animacion.txt") {
 	std::cout << "Animacion guardada correctamente." << std::endl;
 }
 
-// Función para cargar los KeyFrames
+// Funciï¿½n para cargar los KeyFrames
 void LoadAnimation(const char* filename = "Animacion.txt") {
 	std::ifstream file(filename);
 	if (!file.is_open()) {
@@ -283,7 +289,7 @@ void LoadAnimation(const char* filename = "Animacion.txt") {
 	}
 }
 
-// Función para imprimir el contenido del archivo .txt en consola
+// Funciï¿½n para imprimir el contenido del archivo .txt en consola
 void PrintAnimation(const char* filename = "Animacion.txt") {
 	std::ifstream file(filename);
 	if (!file.is_open()) {
@@ -411,7 +417,8 @@ int main()
 
 	Shader lightingShader("Shader/lighting.vs", "Shader/lighting.frag");
 	Shader lampShader("Shader/lamp.vs", "Shader/lamp.frag");
-	
+	Shader skyboxshader("Shader/SkyBox.vs", "Shader/SkyBox.frag");
+
 	Model mesa((char*)"Models/mesa/mesa.obj");
 	Model Moon((char*)"Models/Moon/moon.obj");
 	//Model focos((char*)"Models/tele/pizarron.obj");
@@ -504,14 +511,83 @@ int main()
 	//}
 
 	//////////////////////////////////// FIN KEYFRAMES ///////////////////////////////
-	
+	GLfloat skyboxScale = 0.0000000001f;
+	GLfloat skyboxVertices[] = {
+		// Positions
+		-1.0f * skyboxScale,  1.0f * skyboxScale, -1.0f * skyboxScale,
+		-1.0f * skyboxScale, -1.0f * skyboxScale, -1.0f * skyboxScale,
+		1.0f * skyboxScale, -1.0f * skyboxScale, -1.0f * skyboxScale,
+		1.0f * skyboxScale, -1.0f * skyboxScale, -1.0f * skyboxScale,
+		1.0f * skyboxScale,  1.0f * skyboxScale, -1.0f * skyboxScale,
+		-1.0f * skyboxScale,  1.0f * skyboxScale, -1.0f * skyboxScale,
+
+		-1.0f * skyboxScale, -1.0f * skyboxScale,  1.0f * skyboxScale,
+		-1.0f * skyboxScale, -1.0f * skyboxScale, -1.0f * skyboxScale,
+		-1.0f * skyboxScale,  1.0f * skyboxScale, -1.0f * skyboxScale,
+		-1.0f * skyboxScale,  1.0f * skyboxScale, -1.0f * skyboxScale,
+		-1.0f * skyboxScale,  1.0f * skyboxScale,  1.0f * skyboxScale,
+		-1.0f * skyboxScale, -1.0f * skyboxScale,  1.0f * skyboxScale,
+
+		1.0f * skyboxScale, -1.0f * skyboxScale, -1.0f * skyboxScale,
+		1.0f * skyboxScale, -1.0f * skyboxScale,  1.0f * skyboxScale,
+		1.0f * skyboxScale,  1.0f * skyboxScale,  1.0f * skyboxScale,
+		1.0f * skyboxScale,  1.0f * skyboxScale,  1.0f * skyboxScale,
+		1.0f * skyboxScale,  1.0f * skyboxScale, -1.0f * skyboxScale,
+		1.0f * skyboxScale, -1.0f * skyboxScale, -1.0f * skyboxScale,
+
+		-1.0f * skyboxScale, -1.0f * skyboxScale,  1.0f * skyboxScale,
+		-1.0f * skyboxScale,  1.0f * skyboxScale,  1.0f * skyboxScale,
+		1.0f * skyboxScale,  1.0f * skyboxScale,  1.0f * skyboxScale,
+		1.0f * skyboxScale,  1.0f * skyboxScale,  1.0f * skyboxScale,
+		1.0f * skyboxScale, -1.0f * skyboxScale,  1.0f * skyboxScale,
+		-1.0f * skyboxScale, -1.0f * skyboxScale,  1.0f * skyboxScale,
+
+		-1.0f * skyboxScale,  1.0f * skyboxScale, -1.0f * skyboxScale,
+		1.0f * skyboxScale,  1.0f * skyboxScale, -1.0f * skyboxScale,
+		1.0f * skyboxScale,  1.0f * skyboxScale,  1.0f * skyboxScale,
+		1.0f * skyboxScale,  1.0f * skyboxScale,  1.0f * skyboxScale,
+		-1.0f * skyboxScale,  1.0f * skyboxScale,  1.0f * skyboxScale,
+		-1.0f * skyboxScale,  1.0f * skyboxScale, -1.0f * skyboxScale,
+
+		-1.0f * skyboxScale, -1.0f * skyboxScale, -1.0f * skyboxScale,
+		-1.0f * skyboxScale, -1.0f * skyboxScale,  1.0f * skyboxScale,
+		1.0f * skyboxScale, -1.0f * skyboxScale, -1.0f * skyboxScale,
+		1.0f * skyboxScale, -1.0f * skyboxScale, -1.0f * skyboxScale,
+		-1.0f * skyboxScale, -1.0f * skyboxScale,  1.0f * skyboxScale,
+		1.0f * skyboxScale, -1.0f * skyboxScale,  1.0f * skyboxScale
+	};
+
+
+	GLuint indices[] =
+	{  // Note that we start from 0!
+		0,1,2,3,
+		4,5,6,7,
+		8,9,10,11,
+		12,13,14,15,
+		16,17,18,19,
+		20,21,22,23,
+		24,25,26,27,
+		28,29,30,31,
+		32,33,34,35
+	};
+
+
 	// First, set the container's VAO (and VBO)
-	GLuint VBO, VAO;
+	GLuint VBO, VAO, EBO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
+	///////////////////BUFFER SKYBOX//////////////////
+	glGenBuffers(1, &EBO);
+	/////////////////////////////////////////////////
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	///////////////////PIPELINE RENDERIZADO SKYBOX//////////////////
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	///////////////////////////////////////////////////////////////
+
+
 	// Position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
@@ -523,6 +599,28 @@ int main()
 	lightingShader.Use();
 	glUniform1i(glGetUniformLocation(lightingShader.Program, "Material.difuse"), 0);
 	glUniform1i(glGetUniformLocation(lightingShader.Program, "Material.specular"), 1);
+
+	///////////////////////////SKYBOX/////////////////////////
+	GLuint skyBoxVBO, skyBoxVAO;
+	glGenVertexArrays(1, &skyBoxVAO);
+	glGenBuffers(1, &skyBoxVBO);
+	glBindVertexArray(skyBoxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyBoxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+
+	//Load textures
+	vector < const GLchar*> faces;
+	faces.push_back("SkyBox/right.jpg");
+	faces.push_back("SkyBox/left.jpg");
+	faces.push_back("SkyBox/top.jpg");
+	faces.push_back("SkyBox/bottom.jpg");
+	faces.push_back("SkyBox/back.jpg");
+	faces.push_back("SkyBox/front.jpg");
+
+	GLuint cubemapTexture = TextureLoading::LoadCubemap(faces);
+	/////////////////////////////////////////////////////////
 
 	glm::mat4 projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
 	
@@ -539,6 +637,9 @@ int main()
 		glfwPollEvents();
 		DoMovement();
 		Animation();
+
+		MonitorAnimation();
+
 		// Clear the colorbuffer
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -730,12 +831,14 @@ int main()
 		Salon.Draw(lightingShader);
 		/*prueba.Draw(lightingShader);*/
 	
-		if(nuevo){
 			
-			humoPosX = 0;
-			humoPosY = 1.0 * 10 * 0.0012;
-			humoPosZ = 0;
+			
 
+
+	if(nuevo){
+		humoPosX = 0;
+		humoPosY = 1.0 * 10 * 0.0012;
+		humoPosZ = 0;
 
 		pizarron = model;
 		pizarron = glm::scale(pizarron, glm::vec3(0.007f, 0.007f, 0.007f));
@@ -1007,8 +1110,7 @@ int main()
 		CPUpiv = glm::scale(CPUpiv, glm::vec3(0.3f, 0.3f, 0.3f));
 
 		moni = glm::translate(pivotecompus, glm::vec3(-55, 0.0f, filaa));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(oldMonitorScale, oldMonitorScale, oldMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		monitor.Draw(lightingShader);
 
@@ -1019,8 +1121,7 @@ int main()
 		teclado.Draw(lightingShader);
 		///////////////
 		moni = glm::translate(pivotecompus, glm::vec3(-55, 0.0f, filab));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(oldMonitorScale, oldMonitorScale, oldMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		monitor.Draw(lightingShader);
 
@@ -1032,10 +1133,10 @@ int main()
 
 		///////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(-55, 0.0f, filac));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(oldMonitorScale, oldMonitorScale, oldMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		monitor.Draw(lightingShader);
+
 		tecla = glm::translate(pTeclado, glm::vec3(-55, 0.0f, filac - 10));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1044,10 +1145,10 @@ int main()
 		///////////////////
 
 		moni = glm::translate(pivotecompus, glm::vec3(-30, 0.0f, filaa));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(oldMonitorScale, oldMonitorScale, oldMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		monitor.Draw(lightingShader);
+
 		tecla = glm::translate(pTeclado, glm::vec3(-30, 0.0f, filaa - 10));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1056,10 +1157,10 @@ int main()
 
 		/////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(-30, 0.0f, filab));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(oldMonitorScale, oldMonitorScale, oldMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		monitor.Draw(lightingShader);
+
 		tecla = glm::translate(pTeclado, glm::vec3(-30, 0.0f, filab - 10));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1067,10 +1168,10 @@ int main()
 		teclado.Draw(lightingShader);
 		///////////////
 		moni = glm::translate(pivotecompus, glm::vec3(-30, 0.0f, filac));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(oldMonitorScale, oldMonitorScale, oldMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		monitor.Draw(lightingShader);
+
 		tecla = glm::translate(pTeclado, glm::vec3(-30, 0.0f, filac - 10));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1134,10 +1235,10 @@ int main()
 
 		//////////////
 		moni = glm::translate(pivotecompus, glm::vec3(45, 0.0f, filaa));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(oldMonitorScale, oldMonitorScale, oldMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		monitor.Draw(lightingShader);
+
 		tecla = glm::translate(pTeclado, glm::vec3(45, 0.0f, filaa - 10));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1145,10 +1246,10 @@ int main()
 		teclado.Draw(lightingShader);
 		////////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(45, 0.0f, filab));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(oldMonitorScale, oldMonitorScale, oldMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		monitor.Draw(lightingShader);
+
 		tecla = glm::translate(pTeclado, glm::vec3(45, 0.0f, filab - 10));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1156,10 +1257,10 @@ int main()
 		teclado.Draw(lightingShader);
 		///////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(45, 0.0f, filac));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(oldMonitorScale, oldMonitorScale, oldMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		monitor.Draw(lightingShader);
+
 		tecla = glm::translate(pTeclado, glm::vec3(45, 0.0f, filac - 10));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1167,10 +1268,10 @@ int main()
 		teclado.Draw(lightingShader);
 		////////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(17, 0.0f, filaa));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(oldMonitorScale, oldMonitorScale, oldMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		monitor.Draw(lightingShader);
+
 		tecla = glm::translate(pTeclado, glm::vec3(17, 0.0f, filaa - 10));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1179,10 +1280,10 @@ int main()
 
 		////////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(17, 0.0f, filab));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(oldMonitorScale, oldMonitorScale, oldMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		monitor.Draw(lightingShader);
+
 		tecla = glm::translate(pTeclado, glm::vec3(17, 0.0f, filab - 10));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1191,8 +1292,7 @@ int main()
 
 		///////////////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(17, 0.0f, filac));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(oldMonitorScale, oldMonitorScale, oldMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		monitor.Draw(lightingShader);
 
@@ -1539,8 +1639,7 @@ int main()
 		CPUpiv = glm::scale(CPUpiv, glm::vec3(0.1f, 0.1f, 0.1f));*/
 
 		moni = glm::translate(pivotecompus, glm::vec3(colca, 0.0f, filaa));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(newMonitorScale, newMonitorScale, newMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		moniGamer.Draw(lightingShader);
 
@@ -1551,8 +1650,7 @@ int main()
 		tecladoled.Draw(lightingShader);
 		///////////////
 		moni = glm::translate(pivotecompus, glm::vec3(colca, 0.0f, filab));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(newMonitorScale, newMonitorScale, newMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		moniGamer.Draw(lightingShader);
 
@@ -1564,10 +1662,10 @@ int main()
 
 		///////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(colca, 0.0f, filac));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(newMonitorScale, newMonitorScale, newMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		moniGamer.Draw(lightingShader);
+
 		tecla = glm::translate(pTeclado, glm::vec3(-230, 0.0f,240));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1576,10 +1674,10 @@ int main()
 		///////////////////
 
 		moni = glm::translate(pivotecompus, glm::vec3(colcb, 0.0f, filaa));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(newMonitorScale, newMonitorScale, newMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		moniGamer.Draw(lightingShader);
+
 		tecla = glm::translate(pTeclado, glm::vec3(-115, 0.0f, -75));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1588,10 +1686,10 @@ int main()
 
 		/////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(colcb, 0.0f, filab));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(newMonitorScale, newMonitorScale, newMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		moniGamer.Draw(lightingShader);
+
 		tecla = glm::translate(pTeclado, glm::vec3(-115, 0.0f, 80));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1599,10 +1697,10 @@ int main()
 		tecladoled.Draw(lightingShader);
 		///////////////
 		moni = glm::translate(pivotecompus, glm::vec3(colcb, 0.0f, filac));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(newMonitorScale, newMonitorScale, newMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		moniGamer.Draw(lightingShader);
+
 		tecla = glm::translate(pTeclado, glm::vec3(-115, 0.0f, 240));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1648,10 +1746,10 @@ int main()
 
 		//////////////
 		moni = glm::translate(pivotecompus, glm::vec3(colcd, 0.0f, filaa));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(newMonitorScale, newMonitorScale, newMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		moniGamer.Draw(lightingShader);
+
 		tecla = glm::translate(pTeclado, glm::vec3(200, 0.0f, -75));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1659,10 +1757,10 @@ int main()
 		tecladoled.Draw(lightingShader);
 		////////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(colcd, 0.0f, filab));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(newMonitorScale, newMonitorScale, newMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		moniGamer.Draw(lightingShader);
+
 		tecla = glm::translate(pTeclado, glm::vec3(200, 0.0f, 80));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1670,10 +1768,10 @@ int main()
 		tecladoled.Draw(lightingShader);
 		///////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(colcd, 0.0f, filac));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(newMonitorScale, newMonitorScale, newMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		moniGamer.Draw(lightingShader);
+
 		tecla = glm::translate(pTeclado, glm::vec3(200, 0.0f, 240));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1681,10 +1779,10 @@ int main()
 		tecladoled.Draw(lightingShader);
 		////////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(colcc, 0.0f, filaa));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(newMonitorScale, newMonitorScale, newMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		moniGamer.Draw(lightingShader);
+
 		tecla = glm::translate(pTeclado, glm::vec3(90, 0.0f, -75));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1693,10 +1791,10 @@ int main()
 
 		////////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(colcc, 0.0f, filab));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(newMonitorScale, newMonitorScale, newMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		moniGamer.Draw(lightingShader);
+
 		tecla = glm::translate(pTeclado, glm::vec3(90, 0.0f, 80));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1705,8 +1803,7 @@ int main()
 
 		///////////////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(colcc, 0.0f, filac));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		moni = glm::scale(moni, glm::vec3(newMonitorScale, newMonitorScale, newMonitorScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		moniGamer.Draw(lightingShader);
 
@@ -1771,16 +1868,7 @@ int main()
 
 
 	}
-
-		
-
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-	//
-
-
 	
-		
-
 		/* Also draw the lamp object, again binding the appropriate shader*/
 		lampShader.Use();
 		// Get location objects for the matrices on the lamp shader (these could be different on a different shader)
@@ -1798,23 +1886,34 @@ int main()
 		Moon.Draw(lampShader);
 		glBindVertexArray(VAO);
 	
-		// Draw the light object (using light's vertex attributes)
-		//for (GLuint i = 3; i < 4; i++)
-		//{
-		//	model = glm::mat4(1);
-		//	model = glm::translate(model, pointLightPositions[i]);
-		//	model = glm::scale(model, glm::vec3(0.02f)); // Make it a smaller cube
-		//	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//	glBindVertexArray(VAO);
-		//	glDrawArrays(GL_TRIANGLES, 0, 36);
-		//}
 		glBindVertexArray(0);
 
+		// Draw skybox as last
+		glDepthFunc(GL_LEQUAL); //hace que no interfiera con otros objetos //Funciï¿½n de profundidad
+		skyboxshader.Use();
+		view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
+		glUniformMatrix4fv(glGetUniformLocation(skyboxshader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(skyboxshader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+		glBindVertexArray(skyBoxVAO);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		glDepthFunc(GL_LESS);
 
 
-		// Swap the screen buffers
+		// Swap the buffers
+		glDeleteVertexArrays(1, &VAO);
 		glfwSwapBuffers(window);
+
 	}
+	/////////////////Borramos buffers/////////////////
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
+	glDeleteVertexArrays(1, &skyBoxVAO);
+	glDeleteBuffers(1, &skyBoxVAO);
 
 
 	// Terminate GLFW, clearing any resources allocated by GLFW.
@@ -1915,12 +2014,12 @@ void DoMovement()
 		luz3 = 1;
 	}
 
-	if (keys[GLFW_KEY_7]) {
+	/*if (keys[GLFW_KEY_7]) {
 		nuevo = 0;
 	}
 	if (keys[GLFW_KEY_8]) {
 		nuevo = 1;
-	}
+	}*/
 	
 	
 
@@ -2002,6 +2101,16 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 
 	}
 
+	if (key == GLFW_KEY_M && action == GLFW_PRESS) {
+		// Tecla 'M' para iniciar/reiniciar la animaciï¿½n de monitores
+		monitorAnimationActive = true;
+		monitorAnimationState = 0;
+		oldMonitorScale = 1.0f;
+		newMonitorScale = 0.0f;
+		monitorAnimFrame = 0;
+		nuevo = 0; // Asegurar que empezamos mostrando el laboratorio viejo
+	}
+
 	if (key == GLFW_KEY_K && GLFW_PRESS == action)
 	{
 		if (FrameIndex < MAX_FRAMES)
@@ -2012,13 +2121,13 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 	}
 
 	if (key == GLFW_KEY_Q && GLFW_PRESS == action) {
-		SaveAnimation();  // Guarda la animación en "Animacion.txt"
+		SaveAnimation();  // Guarda la animaciï¿½n en "Animacion.txt"
 	}
 
 	if (key == GLFW_KEY_R && GLFW_PRESS == action) {
 
 		resetElements();  // Resetear los elementos a los primeros keyframes cargados
-		LoadAnimation(); //Carga la animación por medio del archivo previamente guardado
+		LoadAnimation(); //Carga la animaciï¿½n por medio del archivo previamente guardado
 		PrintAnimation(); //Imprime en terminar los valores del archivo
 	}
 
@@ -2218,6 +2327,44 @@ void Animation() {
 
 	}
 
+}
+
+void MonitorAnimation() {
+	if (!monitorAnimationActive) return;
+
+	// Ya estamos en laboratorio nuevo pero seguimos mostrando la animaciï¿½n de monitores
+	if (nuevo == 1) {
+		// Transiciï¿½n de monitores viejos a monitores nuevos (en lab nuevo)
+		if (monitorAnimationState == 1) {
+			// En el lab nuevo, empezamos con los monitores ocultos y los hacemos aparecer
+			newMonitorScale = (float)monitorAnimFrame / MONITOR_ANIM_MAX_FRAMES;
+
+			monitorAnimFrame++;
+			if (monitorAnimFrame >= MONITOR_ANIM_MAX_FRAMES) {
+				// La animaciï¿½n ha terminado
+				monitorAnimationActive = false;
+				newMonitorScale = 1.0f;  // Monitores nuevos completamente visibles
+			}
+		}
+	}
+	else {
+		// Todavï¿½a estamos en laboratorio viejo, hacemos la transiciï¿½n normal
+		if (monitorAnimationState == 0) {
+			// Desvaneciendo monitores viejos
+			oldMonitorScale = 1.0f - ((float)monitorAnimFrame / (MONITOR_ANIM_MAX_FRAMES * 3));
+
+			monitorAnimFrame++;
+			if (monitorAnimFrame >= MONITOR_ANIM_MAX_FRAMES * 3) {
+				monitorAnimFrame = 0;
+				monitorAnimationState = 1;
+
+				// Aquï¿½ cambiamos al laboratorio nuevo justo despuï¿½s de desvanecer los viejos
+				oldMonitorScale = 0.0f;
+				newMonitorScale = 0.0f;  // Empezamos con monitores nuevos ocultos
+				nuevo = 1;  // Cambiamos al laboratorio nuevo
+			}
+		}
+	}
 }
 
 void MouseCallback(GLFWwindow *window, double xPos, double yPos)
