@@ -66,7 +66,7 @@ int luz3 = 0;
 int luz4 = 0;
 int cont = 0;
 
-int nuevo = 1;
+int nuevo = 0;
 // Positions of the point lights
 glm::vec3 pointLightPositions[] = {
 	glm::vec3(0.43f,0.25f,1.6f),
@@ -1915,12 +1915,12 @@ void DoMovement()
 		luz3 = 1;
 	}
 
-	if (keys[GLFW_KEY_7]) {
+	/*if (keys[GLFW_KEY_7]) {
 		nuevo = 0;
 	}
 	if (keys[GLFW_KEY_8]) {
 		nuevo = 1;
-	}
+	}*/
 	
 	if (keys[GLFW_KEY_O])
 	{
@@ -2006,6 +2006,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 		oldMonitorScale = 1.0f;
 		newMonitorScale = 0.0f;
 		monitorAnimFrame = 0;
+		nuevo = 0; // Asegurar que empezamos mostrando el laboratorio viejo
 	}
 
 	if (key == GLFW_KEY_K && GLFW_PRESS == action)
@@ -2091,28 +2092,37 @@ void Animation() {
 void MonitorAnimation() {
 	if (!monitorAnimationActive) return;
 
-	// Transición de monitores viejos a monitores nuevos
-	if (monitorAnimationState == 0) {
-		// Desvaneciendo monitores viejos
-		oldMonitorScale = 1.0f - ((float)monitorAnimFrame / MONITOR_ANIM_MAX_FRAMES);
+	// Ya estamos en laboratorio nuevo pero seguimos mostrando la animación de monitores
+	if (nuevo == 1) {
+		// Transición de monitores viejos a monitores nuevos (en lab nuevo)
+		if (monitorAnimationState == 1) {
+			// En el lab nuevo, empezamos con los monitores ocultos y los hacemos aparecer
+			newMonitorScale = (float)monitorAnimFrame / MONITOR_ANIM_MAX_FRAMES;
 
-		monitorAnimFrame++;
-		if (monitorAnimFrame >= MONITOR_ANIM_MAX_FRAMES) {
-			monitorAnimFrame = 0;
-			monitorAnimationState = 1;
+			monitorAnimFrame++;
+			if (monitorAnimFrame >= MONITOR_ANIM_MAX_FRAMES) {
+				// La animación ha terminado
+				monitorAnimationActive = false;
+				newMonitorScale = 1.0f;  // Monitores nuevos completamente visibles
+			}
 		}
 	}
-	else if (monitorAnimationState == 1) {
-		// Apareciendo monitores nuevos
-		newMonitorScale = (float)monitorAnimFrame / MONITOR_ANIM_MAX_FRAMES;
+	else {
+		// Todavía estamos en laboratorio viejo, hacemos la transición normal
+		if (monitorAnimationState == 0) {
+			// Desvaneciendo monitores viejos
+			oldMonitorScale = 1.0f - ((float)monitorAnimFrame / (MONITOR_ANIM_MAX_FRAMES * 3));
 
-		monitorAnimFrame++;
-		if (monitorAnimFrame >= MONITOR_ANIM_MAX_FRAMES) {
-			monitorAnimFrame = 0;
-			// Completar un ciclo
-			monitorAnimationState = 0;
-			oldMonitorScale = 1.0f;
-			newMonitorScale = 0.0f;
+			monitorAnimFrame++;
+			if (monitorAnimFrame >= MONITOR_ANIM_MAX_FRAMES * 3) {
+				monitorAnimFrame = 0;
+				monitorAnimationState = 1;
+
+				// Aquí cambiamos al laboratorio nuevo justo después de desvanecer los viejos
+				oldMonitorScale = 0.0f;
+				newMonitorScale = 0.0f;  // Empezamos con monitores nuevos ocultos
+				nuevo = 1;  // Cambiamos al laboratorio nuevo
+			}
 		}
 	}
 }
