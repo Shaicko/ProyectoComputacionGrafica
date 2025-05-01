@@ -19,9 +19,6 @@
 // Other Libs
 #include "stb_image.h"
 
-//libreria para el skybox
-//#include "Texture.h"
-
 // GLM Mathematics
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -35,6 +32,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Model.h"
+#include "Texture.h"
 
 // Function prototypes
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
@@ -47,7 +45,7 @@ const GLuint WIDTH = 1500, HEIGHT = 650;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // Camera
-Camera  camera(glm::vec3(0.0f, 0.0f, 5.0f));
+Camera camera(glm::vec3(0.0f, 0.5f, 0.0f));
 GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
 bool keys[1024];
@@ -359,7 +357,8 @@ int main()
 
 	Shader lightingShader("Shader/lighting.vs", "Shader/lighting.frag");
 	Shader lampShader("Shader/lamp.vs", "Shader/lamp.frag");
-	
+	Shader skyboxshader("Shader/SkyBox.vs", "Shader/SkyBox.frag");
+
 	Model mesa((char*)"Models/mesa/mesa.obj");
 	Model Moon((char*)"Models/Moon/moon.obj");
 	//Model focos((char*)"Models/tele/pizarron.obj");
@@ -452,14 +451,83 @@ int main()
 	//}
 
 	//////////////////////////////////// FIN KEYFRAMES ///////////////////////////////
-	
+	GLfloat skyboxScale = 0.0000000001f;
+	GLfloat skyboxVertices[] = {
+		// Positions
+		-1.0f * skyboxScale,  1.0f * skyboxScale, -1.0f * skyboxScale,
+		-1.0f * skyboxScale, -1.0f * skyboxScale, -1.0f * skyboxScale,
+		1.0f * skyboxScale, -1.0f * skyboxScale, -1.0f * skyboxScale,
+		1.0f * skyboxScale, -1.0f * skyboxScale, -1.0f * skyboxScale,
+		1.0f * skyboxScale,  1.0f * skyboxScale, -1.0f * skyboxScale,
+		-1.0f * skyboxScale,  1.0f * skyboxScale, -1.0f * skyboxScale,
+
+		-1.0f * skyboxScale, -1.0f * skyboxScale,  1.0f * skyboxScale,
+		-1.0f * skyboxScale, -1.0f * skyboxScale, -1.0f * skyboxScale,
+		-1.0f * skyboxScale,  1.0f * skyboxScale, -1.0f * skyboxScale,
+		-1.0f * skyboxScale,  1.0f * skyboxScale, -1.0f * skyboxScale,
+		-1.0f * skyboxScale,  1.0f * skyboxScale,  1.0f * skyboxScale,
+		-1.0f * skyboxScale, -1.0f * skyboxScale,  1.0f * skyboxScale,
+
+		1.0f * skyboxScale, -1.0f * skyboxScale, -1.0f * skyboxScale,
+		1.0f * skyboxScale, -1.0f * skyboxScale,  1.0f * skyboxScale,
+		1.0f * skyboxScale,  1.0f * skyboxScale,  1.0f * skyboxScale,
+		1.0f * skyboxScale,  1.0f * skyboxScale,  1.0f * skyboxScale,
+		1.0f * skyboxScale,  1.0f * skyboxScale, -1.0f * skyboxScale,
+		1.0f * skyboxScale, -1.0f * skyboxScale, -1.0f * skyboxScale,
+
+		-1.0f * skyboxScale, -1.0f * skyboxScale,  1.0f * skyboxScale,
+		-1.0f * skyboxScale,  1.0f * skyboxScale,  1.0f * skyboxScale,
+		1.0f * skyboxScale,  1.0f * skyboxScale,  1.0f * skyboxScale,
+		1.0f * skyboxScale,  1.0f * skyboxScale,  1.0f * skyboxScale,
+		1.0f * skyboxScale, -1.0f * skyboxScale,  1.0f * skyboxScale,
+		-1.0f * skyboxScale, -1.0f * skyboxScale,  1.0f * skyboxScale,
+
+		-1.0f * skyboxScale,  1.0f * skyboxScale, -1.0f * skyboxScale,
+		1.0f * skyboxScale,  1.0f * skyboxScale, -1.0f * skyboxScale,
+		1.0f * skyboxScale,  1.0f * skyboxScale,  1.0f * skyboxScale,
+		1.0f * skyboxScale,  1.0f * skyboxScale,  1.0f * skyboxScale,
+		-1.0f * skyboxScale,  1.0f * skyboxScale,  1.0f * skyboxScale,
+		-1.0f * skyboxScale,  1.0f * skyboxScale, -1.0f * skyboxScale,
+
+		-1.0f * skyboxScale, -1.0f * skyboxScale, -1.0f * skyboxScale,
+		-1.0f * skyboxScale, -1.0f * skyboxScale,  1.0f * skyboxScale,
+		1.0f * skyboxScale, -1.0f * skyboxScale, -1.0f * skyboxScale,
+		1.0f * skyboxScale, -1.0f * skyboxScale, -1.0f * skyboxScale,
+		-1.0f * skyboxScale, -1.0f * skyboxScale,  1.0f * skyboxScale,
+		1.0f * skyboxScale, -1.0f * skyboxScale,  1.0f * skyboxScale
+	};
+
+
+	GLuint indices[] =
+	{  // Note that we start from 0!
+		0,1,2,3,
+		4,5,6,7,
+		8,9,10,11,
+		12,13,14,15,
+		16,17,18,19,
+		20,21,22,23,
+		24,25,26,27,
+		28,29,30,31,
+		32,33,34,35
+	};
+
+
 	// First, set the container's VAO (and VBO)
-	GLuint VBO, VAO;
+	GLuint VBO, VAO, EBO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
+	///////////////////BUFFER SKYBOX//////////////////
+	glGenBuffers(1, &EBO);
+	/////////////////////////////////////////////////
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	///////////////////PIPELINE RENDERIZADO SKYBOX//////////////////
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	///////////////////////////////////////////////////////////////
+
+
 	// Position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
@@ -471,6 +539,28 @@ int main()
 	lightingShader.Use();
 	glUniform1i(glGetUniformLocation(lightingShader.Program, "Material.difuse"), 0);
 	glUniform1i(glGetUniformLocation(lightingShader.Program, "Material.specular"), 1);
+
+	///////////////////////////SKYBOX/////////////////////////
+	GLuint skyBoxVBO, skyBoxVAO;
+	glGenVertexArrays(1, &skyBoxVAO);
+	glGenBuffers(1, &skyBoxVBO);
+	glBindVertexArray(skyBoxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyBoxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+
+	//Load textures
+	vector < const GLchar*> faces;
+	faces.push_back("SkyBox/right.jpg");
+	faces.push_back("SkyBox/left.jpg");
+	faces.push_back("SkyBox/top.jpg");
+	faces.push_back("SkyBox/bottom.jpg");
+	faces.push_back("SkyBox/back.jpg");
+	faces.push_back("SkyBox/front.jpg");
+
+	GLuint cubemapTexture = TextureLoading::LoadCubemap(faces);
+	/////////////////////////////////////////////////////////
 
 	glm::mat4 projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
 	
@@ -1715,11 +1805,32 @@ int main()
 		//}
 		glBindVertexArray(0);
 
+		// Draw skybox as last
+		glDepthFunc(GL_LEQUAL); //hace que no interfiera con otros objetos //Función de profundidad
+		skyboxshader.Use();
+		view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
+		glUniformMatrix4fv(glGetUniformLocation(skyboxshader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(skyboxshader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+		glBindVertexArray(skyBoxVAO);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		glDepthFunc(GL_LESS);
 
 
-		// Swap the screen buffers
+		// Swap the buffers
+		glDeleteVertexArrays(1, &VAO);
 		glfwSwapBuffers(window);
+
 	}
+	/////////////////Borramos buffers/////////////////
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
+	glDeleteVertexArrays(1, &skyBoxVAO);
+	glDeleteBuffers(1, &skyBoxVAO);
 
 
 	// Terminate GLFW, clearing any resources allocated by GLFW.
