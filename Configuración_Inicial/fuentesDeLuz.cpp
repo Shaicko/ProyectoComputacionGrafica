@@ -61,6 +61,8 @@ GLfloat lastFrame = 0.0f;  	// Time of last frame
 glm::vec3 lightPos(0.0f, 0.0f,5.0f);
 bool active;
 int flag = 0;
+
+int flagg = 1;
 int luz1 = 0;
 int luz2 = 0;
 int luz3 = 0;
@@ -142,6 +144,21 @@ float angle = 0.0f;  // Ángulo inicial
 bool moveRot = false;
 float speed = 0.0001f;
 
+float humoPosX = 0.0f, humoPosY=10.0f, humoPosZ=0.0f;
+float rotatehumo=0.0f;
+float sizehumoxz =0.0004, sizehumoy= 0.0012;
+int part=0;
+float contadorhumo1=0.0;
+float contadorhumo2=0.0;
+float contadorhumo3 = 0.0;
+float contadorhumo4 = 0.0;
+float contadorhumo5 = 0.0;
+float contadorhumo6 = 0.0;
+float contadorhumo7 = 0.0;
+float contadorhumo8 = 0.0;
+float contadorhumo9 = 0.0;
+float contadorhumo10 = 0.0;
+float rhumo = 0.0f;
 
 //Modificar estos KeyFrames pues es para cada animación
 float dogPosX, dogPosY, dogPosZ;
@@ -183,6 +200,38 @@ FRAME KeyFrame[MAX_FRAMES];
 int FrameIndex = 0;			//En qué lugar de la línea de tiempo me encuentro al guardar los datos
 bool play = false;			//Si se está reproduciendo la animación
 int playIndex = 0;			//En qué lugar de la línea de tiempo me encuentro al estar reproduciendo la animación
+bool humoflag = false;
+//flag1
+struct Particle {
+	glm::vec3 position;
+	glm::vec3 size;
+	float rotation;
+};
+Particle H[5];
+void spawnParticle(int i,float x,float y, float z, float sizehumoxz, float sizehumoy,float rotation) {
+	Particle p;
+	p.position = glm::vec3(x, y, z); // Punto de origen
+	p.size = glm::vec3(sizehumoxz, sizehumoy, sizehumoxz); // Punto de origen
+	p.rotation = rotation;
+	H[i] = p;
+}
+
+//void updateParticles(float deltaTime) {
+//	for (auto& p : particles) {
+//		p.life -= deltaTime;
+//		if (p.life > 0.0f) {
+//			p.position += p.velocity * deltaTime;
+//		}
+//	}
+//	// Eliminar partículas muertas
+//	particles.erase(std::remove_if(particles.begin(), particles.end(),
+//		[](const Particle& p) { return p.life <= 0.0f; }), particles.end());
+//}
+void renderParticles(glm::mat4 hum) {
+	
+	
+
+}
 
 // Función para guardar la animación
 void SaveAnimation(const char* filename = "Animacion.txt") {
@@ -312,6 +361,9 @@ void interpolation(void)
 
 int main()
 {
+	for (int i = 0; i <= 4; i++) {
+		spawnParticle(i, humoPosX, humoPosY, humoPosZ, sizehumoy, sizehumoy, rotatehumo);
+	}
 	// Init GLFW
 	glfwInit();
 	// Set all the required options for GLFW
@@ -371,7 +423,7 @@ int main()
 	Model cpu((char*)"Models/CPU/CPU.obj");
 	Model pizarra((char*)"Models/pizarra/pizarra.obj");
 	Model Puer((char*)"Models/puertaA/model.obj");
-
+	Model humo((char*)"Models/humo/humo.obj");
 
 	Model escritorio((char*)"Models/mesanueva/model.obj");
 	Model tele((char*)"Models/Tele/Tele.obj");
@@ -486,7 +538,7 @@ int main()
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
 		DoMovement();
-
+		Animation();
 		// Clear the colorbuffer
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -661,25 +713,30 @@ int main()
 		model2 = glm::mat4(1);
 		moni = glm::mat4(1);
 
+
+
 		glm::mat4 tecla = glm::mat4(1);
 		glm::mat4 CU = glm::mat4(1);
 		glm::mat4 pizarron = glm::mat4(1);
 		glm::mat4 puerta = glm::mat4(1);
 		glm::mat4 rack = glm::mat4(1.0f);
 		glm::mat4 luna = glm::mat4(1);
+		glm::mat4 hum = glm::mat4(1);
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-		//model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
-
-		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(-1.0f, -1.0f, 0.0f));
-		//glUniformMatrix4fv(glGetUniformLocation(lightingShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Salon.Draw(lightingShader);
 		/*prueba.Draw(lightingShader);*/
 	
-		if(!nuevo){
+		if(nuevo){
+			
+			humoPosX = 0;
+			humoPosY = 1.0 * 10 * 0.0012;
+			humoPosZ = 0;
+
+
 		pizarron = model;
 		pizarron = glm::scale(pizarron, glm::vec3(0.007f, 0.007f, 0.007f));
 		pizarron = glm::rotate(pizarron, glm::radians(180.0f), glm::vec3(.00f, -1.0f, 0.0f));
@@ -1043,7 +1100,25 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 		cpu.Draw(lightingShader);
+		if (humoflag) {
+			/*humoPosX= 10.0f*10 ;
+			humoPosY=3*10 *0.0012;
+			humoPosZ= -10.0f*10 * 0.0004;*/
+			for (int i = 0; i <= 3; i++) {
+				hum = CU;
+				glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				hum = glm::scale(hum, H[i].size / 0.0009f);
+				hum = glm::translate(hum, H[i].position);
+				hum = glm::rotate(hum, glm::radians(rhumo), glm::vec3(0.0f, 1.0f, 0.0f));
+				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(hum));
+				glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
+				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(hum));
+				humo.Draw(lightingShader);
+				glDisable(GL_BLEND);
 
+			}
+		}
 		////////////////////CPUS atras izq
 
 		CU = glm::translate(CPUpiv, glm::vec3(-14.5f * 10, 0.0f, 12.0f * 10));
@@ -1139,6 +1214,26 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 		cpu.Draw(lightingShader);
+
+		if (humoflag) {
+			/*humoPosX= 10.0f*10 ;
+			humoPosY=3*10 *0.0012;
+			humoPosZ= -10.0f*10 * 0.0004;*/
+			for (int i = 0; i <= 3; i++) {
+				hum = CU;
+				glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				hum = glm::scale(hum, H[i].size/0.0010f);
+				hum = glm::translate(hum, H[i].position);
+				hum = glm::rotate(hum, glm::radians(rhumo), glm::vec3(0.0f, 1.0f, 0.0f));
+				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(hum));
+				glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
+				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(hum));
+				humo.Draw(lightingShader);
+				glDisable(GL_BLEND);
+
+			}
+		}
 
 		//////////////////////////CPUS MEDIO IZQ
 		CU = glm::translate(CPUpiv, glm::vec3(11.0f * 10, 0.0f, -1.0f * 10));
@@ -1733,6 +1828,7 @@ int main()
 // Moves/alters the camera positions based on user input
 void DoMovement()
 {
+	
 	// Camera controls
 	if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP])
 	{
@@ -1826,6 +1922,8 @@ void DoMovement()
 		nuevo = 1;
 	}
 	
+	
+
 	if (keys[GLFW_KEY_O])
 	{
 
@@ -1871,13 +1969,14 @@ void DoMovement()
 	if (keys[GLFW_KEY_X])
 	{
 
-		flag = 0;
+		humoflag = 0;
 	}
 	if (keys[GLFW_KEY_Z])
 	{
 
-		flag =1;
+		humoflag =1;
 	}
+
 }
 
 // Is called whenever a key is pressed/released via GLFW
@@ -1942,6 +2041,144 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 }
 
 void Animation() {
+
+	if (humoflag) {
+		
+		float rango = 40.0;
+		rhumo += 0.1;
+		
+			if (contadorhumo1 >= rango){
+				contadorhumo2 = 0.000001f;
+				contadorhumo1= 0;
+
+				printf("111111111111111111111111111111");
+			}
+			if (contadorhumo3 >= rango){
+				contadorhumo4 = 0.000001f;
+				contadorhumo3 = 0;
+
+				printf("2222222222222222222222222222");
+			}
+			if (contadorhumo5 >= rango){
+				contadorhumo6 = 0.000001f;
+				contadorhumo5 = 0;
+
+				printf("3333333333333333333333333333333");
+			}
+			if (contadorhumo7 >= rango) {
+				contadorhumo8 = 0.000001f;
+				contadorhumo7 = 0;
+
+				printf("444444444444444444444444444444444");
+			}
+			if (contadorhumo9>= rango) {
+				contadorhumo10 = 0.000001f;
+				contadorhumo9 = 0;
+			}
+			if (flagg) {
+				if (contadorhumo1 == 0) {
+					contadorhumo1 += 0.000001f;
+					H[0].position = glm::vec3(humoPosX, humoPosY, humoPosZ);
+					H[1].position = glm::vec3(humoPosX, humoPosY, humoPosZ);
+					H[2].position = glm::vec3(humoPosX, humoPosY, humoPosZ);
+					H[3].position = glm::vec3(humoPosX, humoPosY, humoPosZ);
+
+
+					H[0].size = glm::vec3(0.000001f, 0.000001f, 0.000001f);
+					H[1].size = glm::vec3(0.000001f, 0.000001f, 0.000001f);
+					H[2].size = glm::vec3(0.000001f, 0.000001f, 0.000001f);
+					H[3].size = glm::vec3(0.000001f, 0.000001f, 0.000001f);
+				}
+				if (contadorhumo1 >= 0 && contadorhumo1 < (rango / 4)) {
+					contadorhumo2 += 0.000001f;
+					contadorhumo1 += 0.05f;
+
+					H[0].position = glm::vec3(humoPosX / contadorhumo2, contadorhumo1 + humoPosY / (contadorhumo2 * 2), humoPosZ / contadorhumo2);
+					H[0].size = glm::vec3(contadorhumo2, contadorhumo2 * 2, contadorhumo2);
+					
+
+				}if (contadorhumo1 >= (rango / 4) && contadorhumo1 < (rango / 2)) {
+					contadorhumo2 += 0.000001f;
+					contadorhumo1 += 0.05f;
+					contadorhumo4 += 0.000001f;
+					contadorhumo3 += 0.05f;
+
+					H[0].position = glm::vec3(humoPosX / contadorhumo2, contadorhumo1 + humoPosY / (contadorhumo2 * 2), humoPosZ / contadorhumo2);
+					H[1].position = glm::vec3(humoPosX / contadorhumo4, contadorhumo3 + humoPosY / (contadorhumo4 * 2), humoPosZ / contadorhumo4);
+					H[0].size = glm::vec3(contadorhumo2, contadorhumo2 * 2, contadorhumo2);
+					H[1].size = glm::vec3(contadorhumo4, contadorhumo4 * 2, contadorhumo4);
+
+				}
+				if (contadorhumo1 >= (rango / 2) && contadorhumo1 < (rango * 3 / 4)) {
+					contadorhumo2 += 0.000001f;
+					contadorhumo1 += 0.05f;
+					contadorhumo4 += 0.000001f;
+					contadorhumo3 += 0.05f;
+					contadorhumo6 += 0.000001f;
+					contadorhumo5 += 0.05f;
+					H[0].position = glm::vec3(humoPosX / contadorhumo2, contadorhumo1 + humoPosY / (contadorhumo2 * 2), humoPosZ / contadorhumo2);
+					H[1].position = glm::vec3(humoPosX / contadorhumo4, contadorhumo3 + humoPosY / (contadorhumo4 * 2), humoPosZ / contadorhumo4);
+					H[2].position = glm::vec3(humoPosX / contadorhumo6, contadorhumo5 + humoPosY / (contadorhumo6 * 2), humoPosZ / contadorhumo6);
+					H[0].size = glm::vec3(contadorhumo2, contadorhumo2 * 2, contadorhumo2);
+					H[1].size = glm::vec3(contadorhumo4, contadorhumo4 * 2, contadorhumo4);					
+					H[2].size = glm::vec3(contadorhumo6, contadorhumo6 * 2, contadorhumo6);
+					
+
+				}
+				if (contadorhumo1 >= (rango * 3 / 4) && contadorhumo1 < rango) {
+					contadorhumo2 += 0.000001f;
+					contadorhumo1 += 0.05f;
+					contadorhumo4 += 0.000001f;
+					contadorhumo3 += 0.05f;
+					contadorhumo6 += 0.000001f;
+					contadorhumo5 += 0.05f;
+					contadorhumo8 += 0.000001f;
+					contadorhumo7 += 0.05f;
+					H[0].position = glm::vec3(humoPosX / contadorhumo2, contadorhumo1 + humoPosY / (contadorhumo2 * 2), humoPosZ / contadorhumo2);
+					H[1].position = glm::vec3(humoPosX / contadorhumo4, contadorhumo3 + humoPosY / (contadorhumo4 * 2), humoPosZ / contadorhumo4);
+					H[2].position = glm::vec3(humoPosX / contadorhumo6, contadorhumo5 + humoPosY / (contadorhumo6 * 2), humoPosZ / contadorhumo6);
+					H[3].position = glm::vec3(humoPosX / contadorhumo8, contadorhumo7 + humoPosY / (contadorhumo8 * 2), humoPosZ / contadorhumo8);
+					H[0].size = glm::vec3(contadorhumo2, contadorhumo2 * 2, contadorhumo2);
+					H[1].size = glm::vec3(contadorhumo4, contadorhumo4 * 2, contadorhumo4);
+					H[2].size = glm::vec3(contadorhumo6, contadorhumo6 * 2, contadorhumo6);
+					H[3].size = glm::vec3(contadorhumo8, contadorhumo8 * 2, contadorhumo8);
+					
+					
+
+				}
+
+				if (contadorhumo1 >= rango) {
+					flagg = 0;
+
+					/*H[4].size = glm::vec3(contadorhumo2, contadorhumo2 * 2, contadorhumo2);
+					H[4].position = glm::vec3(humoPosX, contadorhumo1 + humoPosY/contadorhumo2*2, humoPosZ);*/
+				}
+			}
+			else {
+				
+					contadorhumo2 += 0.000001f;
+					contadorhumo1 += 0.05f;
+					contadorhumo4 += 0.000001f;
+					contadorhumo3 += 0.05f;
+					contadorhumo6 += 0.000001f;
+					contadorhumo5 += 0.05f;
+					contadorhumo8 += 0.000001f;
+					contadorhumo7 += 0.05f;
+					H[0].position = glm::vec3(humoPosX / contadorhumo2, contadorhumo1 + humoPosY/(contadorhumo2*2), humoPosZ / contadorhumo2);
+					H[1].position = glm::vec3(humoPosX / contadorhumo4, contadorhumo3 + humoPosY / (contadorhumo4 * 2), humoPosZ  / contadorhumo4);
+					H[2].position = glm::vec3(humoPosX / contadorhumo6, contadorhumo5 + humoPosY / (contadorhumo6 * 2), humoPosZ / contadorhumo6);
+					H[3].position = glm::vec3(humoPosX / contadorhumo8, contadorhumo7 + humoPosY / (contadorhumo8 * 2), humoPosZ / contadorhumo8);
+					H[0].size = glm::vec3(contadorhumo2, contadorhumo2 * 2, contadorhumo2);
+					H[1].size = glm::vec3(contadorhumo4, contadorhumo4 * 2, contadorhumo4);
+					H[2].size = glm::vec3(contadorhumo6, contadorhumo6 * 2, contadorhumo6);
+					H[3].size = glm::vec3(contadorhumo8, contadorhumo8 * 2, contadorhumo8);
+				}
+			
+			
+
+			
+	}
+
 
 	if (play)
 	{
