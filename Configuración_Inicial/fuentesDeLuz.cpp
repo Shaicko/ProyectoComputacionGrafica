@@ -39,6 +39,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 void MouseCallback(GLFWwindow *window, double xPos, double yPos);
 void DoMovement();
 void MonitorAnimation();
+void SillasTecladosAnimation();
 void Animation(); //Función para los frames 
 
 // Window dimensions
@@ -130,6 +131,18 @@ float oldMonitorScale = 1.0f;  // Escala para monitores viejos
 float newMonitorScale = 0.0f;  // Escala para monitores nuevos
 int monitorAnimFrame = 0;  // Frame actual de la animación
 const int MONITOR_ANIM_MAX_FRAMES = 60;  // Total de frames para cada transición
+
+//Variables para la animación de sillas y teclados
+bool sillasTecladosAnimationActive = false;
+float oldSillasScale = 1.0f;
+float newSillasScale = 0.0f;
+float oldTecladosScale = 1.0f;
+float newTecladosScale = 0.0f;
+int sillasTecladosAnimFrame = 0;
+const int SILLAS_TECLADOS_ANIM_MAX_FRAMES = 60;
+const int SILLAS_SLOWDOWN_FACTOR = 3;
+const int TECLADOS_SLOWDOWN_FACTOR = 2;
+
 //////////////////////////////////// INICIO FRAMES ///////////////////////////////
 //Anim
 float rotBall = 0.0f;
@@ -386,7 +399,8 @@ int main()
 	Model silla2((char*)"Models/GamerChair/GamerChair.obj");
 	Model moniGamer((char*)"Models/MonitorNew/model.obj");
 	Model servidor((char*)"Models/Rack/model.obj");
-	
+	Model servidor2((char*)"Models/Rack/Rack.obj");
+
 	Model prueba((char*)"Models/Pruebas/model.obj");
 
 	////////////////////////// KEYFRAMES //////////////////////////////////
@@ -866,9 +880,9 @@ int main()
 			pivotesillas =glm::translate(model, glm::vec3(-70.0f, 0.0f, -33.0f));
 			pivotesillas =glm::rotate(model, glm::radians(90.0f), glm::vec3(.00f, -1.0f, 0.0f));*/
 
-
+		//Sillas viejas
 		pivotesillas = model;
-		pivotesillas = glm::scale(pivotesillas, glm::vec3(0.0015f, 0.0015f, 0.0015f));
+		pivotesillas = glm::scale(pivotesillas, glm::vec3(0.0015f * oldSillasScale, 0.0015f * oldSillasScale, 0.0015f * oldSillasScale));
 		pivotesillas = glm::translate(pivotesillas, glm::vec3(12.0f, 0.0f, 28.0f));
 		pivotesillas = glm::rotate(pivotesillas, glm::radians(90.0f), glm::vec3(.00f, -1.0f, 0.0f));
 		//delante izq
@@ -1055,8 +1069,7 @@ int main()
 		monitor.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(-55, 0.0f, -50));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(oldTecladosScale, oldTecladosScale, oldTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 		///////////////
@@ -1066,8 +1079,7 @@ int main()
 		monitor.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(-55, 0.0f, -10));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(oldTecladosScale, oldTecladosScale, oldTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
@@ -1078,8 +1090,7 @@ int main()
 		monitor.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(-55, 0.0f, filac - 10));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(oldTecladosScale, oldTecladosScale, oldTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 		///////////////////
@@ -1102,8 +1113,7 @@ int main()
 		monitor.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(-30, 0.0f, filab - 10));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(oldTecladosScale, oldTecladosScale, oldTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 		///////////////
@@ -1113,8 +1123,7 @@ int main()
 		monitor.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(-30, 0.0f, filac - 10));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(oldTecladosScale, oldTecladosScale, oldTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
@@ -1162,8 +1171,7 @@ int main()
 		monitor.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(45, 0.0f, filaa - 10));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(oldTecladosScale, oldTecladosScale, oldTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 		////////////////////////
@@ -1173,8 +1181,7 @@ int main()
 		monitor.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(45, 0.0f, filab - 10));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(oldTecladosScale, oldTecladosScale, oldTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 		///////////////////////
@@ -1184,8 +1191,7 @@ int main()
 		monitor.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(45, 0.0f, filac - 10));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(oldTecladosScale, oldTecladosScale, oldTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 		////////////////////////
@@ -1195,8 +1201,7 @@ int main()
 		monitor.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(17, 0.0f, filaa - 10));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(oldTecladosScale, oldTecladosScale, oldTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
@@ -1207,8 +1212,7 @@ int main()
 		monitor.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(17, 0.0f, filab - 10));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(oldTecladosScale, oldTecladosScale, oldTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
@@ -1219,8 +1223,7 @@ int main()
 		monitor.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(17, 0.0f, filac - 10));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(oldTecladosScale, oldTecladosScale, oldTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 		/////////////////////////
@@ -1288,7 +1291,7 @@ int main()
 
 		modelTemp = model;
 		modelTemp = glm::scale(modelTemp, glm::vec3(0.08f, 0.08f, 0.08f));
-		modelTemp = glm::translate(modelTemp, glm::vec3(0.0f,0.13f, 0.0f));
+		modelTemp = glm::translate(modelTemp, glm::vec3(0.0f, 0.13f, 0.0f));
 		//modelTemp= glm::rotate(modelTemp, glm::radians(90.0f), glm::vec3(-1.0f, -1.0f, 0.0f));
 
 		model1 = glm::translate(modelTemp, glm::vec3(-1.02f, 0.0f, -0.65f));
@@ -1352,11 +1355,12 @@ int main()
 		float fSn2 = 3.0f;
 		float fSn3 = 7.0f;
 
-		
+
 		pivotesillas = model;
-		pivotesillas = glm::scale(pivotesillas, glm::vec3(0.015f, 0.015f, 0.015f));
+		pivotesillas = glm::scale(pivotesillas, glm::vec3(0.015f * newSillasScale, 0.015f * newSillasScale, 0.015f * newSillasScale));
 		pivotesillas = glm::translate(pivotesillas, glm::vec3(0.0f, 0.0f, 0.0f));
 		pivotesillas = glm::rotate(pivotesillas, glm::radians(90.0f), glm::vec3(.00f, -1.0f, 0.0f));
+
 		//delante izq
 
 		model2 = glm::translate(pivotesillas, glm::vec3(fSn1, 0.0f, 6.0f));
@@ -1395,7 +1399,7 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		silla2.Draw(lightingShader);
-		
+
 		model2 = glm::translate(pivotesillas, glm::vec3(fSn2, 0.0f, 3.2f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1546,8 +1550,7 @@ int main()
 		moniGamer.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(-230.0f, 0.0f, -75));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(newTecladosScale, newTecladosScale, newTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 		///////////////
@@ -1556,9 +1559,8 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		moniGamer.Draw(lightingShader);
 
-		tecla = glm::translate(pTeclado, glm::vec3(-230, 0.0f,80));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::translate(pTeclado, glm::vec3(-230, 0.0f, 80));
+		tecla = glm::scale(tecla, glm::vec3(newTecladosScale, newTecladosScale, newTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 
@@ -1568,9 +1570,8 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moni));
 		moniGamer.Draw(lightingShader);
 
-		tecla = glm::translate(pTeclado, glm::vec3(-230, 0.0f,240));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::translate(pTeclado, glm::vec3(-230, 0.0f, 240));
+		tecla = glm::scale(tecla, glm::vec3(newTecladosScale, newTecladosScale, newTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 		///////////////////
@@ -1581,8 +1582,7 @@ int main()
 		moniGamer.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(-115, 0.0f, -75));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(newTecladosScale, newTecladosScale, newTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 
@@ -1593,8 +1593,7 @@ int main()
 		moniGamer.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(-115, 0.0f, 80));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(newTecladosScale, newTecladosScale, newTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 		///////////////
@@ -1604,8 +1603,7 @@ int main()
 		moniGamer.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(-115, 0.0f, 240));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(newTecladosScale, newTecladosScale, newTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 
@@ -1653,8 +1651,7 @@ int main()
 		moniGamer.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(200, 0.0f, -75));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(newTecladosScale, newTecladosScale, newTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 		////////////////////////
@@ -1664,8 +1661,7 @@ int main()
 		moniGamer.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(200, 0.0f, 80));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(newTecladosScale, newTecladosScale, newTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 		///////////////////////
@@ -1675,8 +1671,7 @@ int main()
 		moniGamer.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(200, 0.0f, 240));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(newTecladosScale, newTecladosScale, newTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 		////////////////////////
@@ -1686,8 +1681,7 @@ int main()
 		moniGamer.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(90, 0.0f, -75));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(newTecladosScale, newTecladosScale, newTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 
@@ -1698,8 +1692,7 @@ int main()
 		moniGamer.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(90, 0.0f, 80));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(newTecladosScale, newTecladosScale, newTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 
@@ -1710,15 +1703,14 @@ int main()
 		moniGamer.Draw(lightingShader);
 
 		tecla = glm::translate(pTeclado, glm::vec3(90, 0.0f, 240));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		tecla = glm::scale(tecla, glm::vec3(newTecladosScale, newTecladosScale, newTecladosScale));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		tecladoled.Draw(lightingShader);
 		/////////////////////////
 		//Rackpiv = model;
 		//Rackpiv = glm::scale(Rackpiv, glm::vec3(0.0015f, 0.0015f, 0.0015f));
 		rack = model;
-		
+
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(rack));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		rack = glm::scale(rack, glm::vec3(0.05f, 0.05f, 0.05f));
@@ -1727,9 +1719,9 @@ int main()
 		servidor.Draw(lightingShader);
 		glBindVertexArray(0);
 
-		
-		
-	
+
+
+
 
 		//////////cpus de mesa de adelante
 		//CU = glm::translate(CPUpiv, glm::vec3(11.0f * 10, 0.0f, -14.0f * 10));
@@ -1769,6 +1761,24 @@ int main()
 		//cpu.Draw(lightingShader);
 
 
+
+
+		glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+		// Rack transparente
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
+		servidor2.Draw(lightingShader);
+
+		// Restaura configuración normal
+		glDisable(GL_BLEND);
+
+		glBindVertexArray(0);
 	}
 	
 		/* Also draw the lamp object, again binding the appropriate shader*/
@@ -1785,8 +1795,8 @@ int main()
 		model = glm::translate(model, glm::vec3(lightPos.x, lightPos.y, lightPos.z));
 		model = glm::scale(model, glm::vec3(0.003f)); // Make it a smaller cube
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Moon.Draw(lampShader);
 		glBindVertexArray(VAO);
+		Moon.Draw(lampShader);
 	
 		glBindVertexArray(0);
 
@@ -2007,6 +2017,12 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 		newMonitorScale = 0.0f;
 		monitorAnimFrame = 0;
 		nuevo = 0; // Asegurar que empezamos mostrando el laboratorio viejo
+		sillasTecladosAnimationActive = true;
+		sillasTecladosAnimFrame = 0;
+		oldSillasScale = 1.0f;
+		oldTecladosScale = 1.0f;
+		newSillasScale = 0.0f;
+		newTecladosScale = 0.0f;
 	}
 
 	if (key == GLFW_KEY_K && GLFW_PRESS == action)
@@ -2123,6 +2139,53 @@ void MonitorAnimation() {
 				newMonitorScale = 0.0f;  // Empezamos con monitores nuevos ocultos
 				nuevo = 1;  // Cambiamos al laboratorio nuevo
 			}
+		}
+	}
+}
+
+void SillasTecladosAnimation() {
+	if (!sillasTecladosAnimationActive) return;
+
+	// Ya estamos en laboratorio nuevo, mostrando la animación de sillas/teclados nuevos
+	if (nuevo == 1) {
+		// Animación de aparición de sillas y teclados nuevos a velocidad normal
+		newSillasScale = (float)sillasTecladosAnimFrame / SILLAS_TECLADOS_ANIM_MAX_FRAMES;
+		newTecladosScale = (float)sillasTecladosAnimFrame / SILLAS_TECLADOS_ANIM_MAX_FRAMES;
+
+		sillasTecladosAnimFrame++;
+		if (sillasTecladosAnimFrame >= SILLAS_TECLADOS_ANIM_MAX_FRAMES) {
+			// La animación ha terminado
+			sillasTecladosAnimationActive = false;
+			newSillasScale = 1.0f;
+			newTecladosScale = 1.0f;
+		}
+	}
+	else {
+		// Todavía estamos en laboratorio viejo, desvaneciendo sillas y teclados viejos
+		// Aplicamos diferentes velocidades para cada elemento
+		oldSillasScale = 1.0f - ((float)sillasTecladosAnimFrame / (SILLAS_TECLADOS_ANIM_MAX_FRAMES * SILLAS_SLOWDOWN_FACTOR));
+		oldTecladosScale = 1.0f - ((float)sillasTecladosAnimFrame / (SILLAS_TECLADOS_ANIM_MAX_FRAMES * TECLADOS_SLOWDOWN_FACTOR));
+
+		sillasTecladosAnimFrame++;
+		// Usamos el factor más lento para determinar cuándo termina la animación
+		int maxSlowdownFactor = (SILLAS_SLOWDOWN_FACTOR > TECLADOS_SLOWDOWN_FACTOR) ?
+			SILLAS_SLOWDOWN_FACTOR : TECLADOS_SLOWDOWN_FACTOR;
+
+		if (sillasTecladosAnimFrame >= SILLAS_TECLADOS_ANIM_MAX_FRAMES * maxSlowdownFactor) {
+			sillasTecladosAnimFrame = 0;
+
+			// Aquí cambiamos al laboratorio nuevo
+			oldSillasScale = 0.0f;
+			oldTecladosScale = 0.0f;
+			newSillasScale = 0.0f;
+			newTecladosScale = 0.0f;
+
+			// Activamos la animación de monitores para que todo ocurra en secuencia
+			monitorAnimationActive = true;
+			monitorAnimationState = 0;
+			monitorAnimFrame = 0;
+			oldMonitorScale = 1.0f;
+			newMonitorScale = 0.0f;
 		}
 	}
 }
