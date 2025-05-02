@@ -600,6 +600,7 @@ int main()
 		DoMovement();
 
 		MonitorAnimation();
+		SillasTecladosAnimation();
 
 		// Clear the colorbuffer
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -2017,7 +2018,9 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 		newMonitorScale = 0.0f;
 		monitorAnimFrame = 0;
 		nuevo = 0; // Asegurar que empezamos mostrando el laboratorio viejo
-		sillasTecladosAnimationActive = true;
+		
+		// Reset pero NO activar todavía la animación de sillas y teclados
+		sillasTecladosAnimationActive = false;
 		sillasTecladosAnimFrame = 0;
 		oldSillasScale = 1.0f;
 		oldTecladosScale = 1.0f;
@@ -2120,6 +2123,12 @@ void MonitorAnimation() {
 				// La animación ha terminado
 				monitorAnimationActive = false;
 				newMonitorScale = 1.0f;  // Monitores nuevos completamente visibles
+				
+				// Activar la animación de sillas y teclados cuando terminan los monitores
+				sillasTecladosAnimationActive = true;
+				sillasTecladosAnimFrame = 0;
+				newSillasScale = 0.0f;
+				newTecladosScale = 0.0f;
 			}
 		}
 	}
@@ -2131,13 +2140,8 @@ void MonitorAnimation() {
 
 			monitorAnimFrame++;
 			if (monitorAnimFrame >= MONITOR_ANIM_MAX_FRAMES * 3) {
-				monitorAnimFrame = 0;
-				monitorAnimationState = 1;
-
-				// Aquí cambiamos al laboratorio nuevo justo después de desvanecer los viejos
-				oldMonitorScale = 0.0f;
-				newMonitorScale = 0.0f;  // Empezamos con monitores nuevos ocultos
-				nuevo = 1;  // Cambiamos al laboratorio nuevo
+				sillasTecladosAnimationActive = true;
+				monitorAnimationActive = false;
 			}
 		}
 	}
@@ -2182,10 +2186,15 @@ void SillasTecladosAnimation() {
 
 			// Activamos la animación de monitores para que todo ocurra en secuencia
 			monitorAnimationActive = true;
-			monitorAnimationState = 0;
+			sillasTecladosAnimationActive = false;
+
 			monitorAnimFrame = 0;
-			oldMonitorScale = 1.0f;
-			newMonitorScale = 0.0f;
+			monitorAnimationState = 1;
+
+			// Aquí cambiamos al laboratorio nuevo justo después de desvanecer los viejos
+			oldMonitorScale = 0.0f;
+			newMonitorScale = 0.0f;  // Empezamos con monitores nuevos ocultos
+			nuevo = 1;  // Cambiamos al laboratorio nuevo
 		}
 	}
 }
