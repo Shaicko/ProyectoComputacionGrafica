@@ -2053,10 +2053,6 @@ void DoMovement()
 		monitores = 1;
 		humoflag = 1;
 	}
-	if (keys[GLFW_KEY_Z])
-	{
-		nuevo =1;
-	}
 
 }
 
@@ -2375,7 +2371,7 @@ void Animation() {
 		else {
 			monitores = 0;
 			humoflag = 0;
-			nuevo = 1;
+			nuevo = 0;
 		}
 	}	
 
