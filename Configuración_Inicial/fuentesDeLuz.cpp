@@ -478,8 +478,8 @@ int main()
 	Model tecladoled((char*)"Models/Led_Teclado/Teclado.obj");
 	Model silla2((char*)"Models/GamerChair/GamerChair.obj");
 	Model moniGamer((char*)"Models/MonitorNew/model.obj");
-	Model servidor((char*)"Models/Rack/model.obj");
-	Model servidor2((char*)"Models/Rack/Rack.obj");
+	Model servidor((char*)"Models/Rack/rackOld.obj");
+	Model servidor2((char*)"Models/Rack/rackNew.obj");
 	Model lampara((char*)"Models/lamp/lamp.obj");
 
 	////////////////////////// KEYFRAMES //////////////////////////////////
@@ -829,7 +829,6 @@ int main()
 		glm::mat4 model1(1);
 		glm::mat4 model2(1);
 		glm::mat4 moni(1);
-		glm::mat4 ratoncito(1); // Declara esta variable una sola vez fuera de los bucles
 
 		//Carga de modelo 
 		view = camera.GetViewMatrix();
@@ -846,6 +845,7 @@ int main()
 		glm::mat4 pizarron = glm::mat4(1);
 		glm::mat4 puerta = glm::mat4(1);
 		glm::mat4 rack = glm::mat4(1.0f);
+		glm::mat4 rack2 = glm::mat4(1.0f);
 		glm::mat4 hum = glm::mat4(1);
 
 		glm::mat4 neon1 = glm::mat4(1);
@@ -1164,11 +1164,6 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
-		// Añadir el mouse junto al teclado
-		ratoncito = tecla;
-		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
-		mouse.Draw(lightingShader);
 		///////////////
 		moni = glm::translate(pivotecompus, glm::vec3(-55/monitor2, 0.0f, filab / monitor2));
 		moni = glm::scale(moni, glm::vec3(monitor2, monitor2, monitor2));
@@ -1180,12 +1175,6 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
-
-		// Añadir el mouse junto al teclado
-		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
-		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
-		mouse.Draw(lightingShader);
 
 		///////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(-55, 0.0f, filac));
@@ -1199,11 +1188,6 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
-		// Añadir el mouse junto al teclado
-		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
-		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
-		mouse.Draw(lightingShader);
 		///////////////////
 
 		moni = glm::translate(pivotecompus, glm::vec3(-30, 0.0f, filaa));
@@ -1217,12 +1201,6 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
-		// Añadir el mouse junto al teclado
-		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
-		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
-		mouse.Draw(lightingShader);;
-
 		/////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(-30, 0.0f, filab));
 		moni = glm::scale(moni, glm::vec3(monitor5, monitor5, monitor5));
@@ -1235,11 +1213,6 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
-		// Añadir el mouse junto al teclado
-		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
-		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
-		mouse.Draw(lightingShader);
 		///////////////
 		moni = glm::translate(pivotecompus, glm::vec3(-30, 0.0f, filac));
 		moni = glm::scale(moni, glm::vec3(monitor6, monitor6, monitor6));
@@ -1252,18 +1225,13 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
-		// Añadir el mouse junto al teclado
-		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
-		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
-		mouse.Draw(lightingShader);
-
 		////////cpus de mesa de adelante
 		CU = glm::translate(CPUpiv, glm::vec3(-14.5f * 10, 0.0f, -14.0f * 10));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 		cpu.Draw(lightingShader);
+
 		CU = glm::translate(CPUpiv, glm::vec3(-13.0f * 10, 0.0f, -14.0f * 10));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1325,11 +1293,6 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
-		// Añadir el mouse junto al teclado
-		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
-		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
-		mouse.Draw(lightingShader);
 		////////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(45, 0.0f, filab));
 		moni = glm::scale(moni, glm::vec3(monitor8, monitor8, monitor8));
@@ -1342,11 +1305,6 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
-		// Añadir el mouse junto al teclado
-		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
-		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
-		mouse.Draw(lightingShader);
 		///////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(45, 0.0f, filac));
 		moni = glm::scale(moni, glm::vec3(monitor9, monitor9, monitor9));
@@ -1359,11 +1317,6 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
-		// Añadir el mouse junto al teclado
-		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
-		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
-		mouse.Draw(lightingShader);
 		////////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(17, 0.0f, filaa));
 		moni = glm::scale(moni, glm::vec3(monitor10, monitor10, monitor10));
@@ -1376,11 +1329,6 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
-		// Añadir el mouse junto al teclado
-		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
-		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
-		mouse.Draw(lightingShader);
 		////////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(17, 0.0f, filab));
 		moni = glm::scale(moni, glm::vec3(monitor11, monitor11, monitor11));
@@ -1393,11 +1341,6 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
-		// Añadir el mouse junto al teclado
-		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
-		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
-		mouse.Draw(lightingShader);
 		///////////////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(17, 0.0f, filac));
 		moni = glm::scale(moni, glm::vec3(monitor12, monitor12, monitor12));
@@ -1410,11 +1353,6 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
-		// Añadir el mouse junto al teclado
-		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
-		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
-		mouse.Draw(lightingShader);
 		/////////////////////////
 
 		////////cpus de mesa de adelante
@@ -1474,8 +1412,11 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 		cpu.Draw(lightingShader);
 
-
-
+		rack = model;
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(rack));
+		servidor.Draw(lightingShader);
+		glBindVertexArray(0);
 	}
 	else {
 		neon1 = model; 
@@ -1936,16 +1877,6 @@ int main()
 		/////////////////////////
 		//Rackpiv = model;
 		//Rackpiv = glm::scale(Rackpiv, glm::vec3(0.0015f, 0.0015f, 0.0015f));
-		rack = model;
-		
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(rack));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		rack = glm::scale(rack, glm::vec3(0.05f, 0.05f, 0.05f));
-		rack = glm::translate(rack, glm::vec3(0.0f, 0.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(rack));
-		servidor.Draw(lightingShader);
-		glBindVertexArray(0);
-
 		
 		
 	
@@ -1987,21 +1918,10 @@ int main()
 		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 		//cpu.Draw(lightingShader);
 
-		glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-
-		// Rack transparente
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
+		rack2 = model;
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(rack2));
 		servidor2.Draw(lightingShader);
-
-		// Restaura configuración normal
-		glDisable(GL_BLEND);
-
 		glBindVertexArray(0);
 
 	}
@@ -2133,10 +2053,10 @@ void DoMovement()
 		monitores = 1;
 		humoflag = 1;
 	}
-	/*if (keys[GLFW_KEY_Z])
+	if (keys[GLFW_KEY_Z])
 	{
-		humoflag =1;
-	}*/
+		nuevo =1;
+	}
 
 }
 
@@ -2455,7 +2375,7 @@ void Animation() {
 		else {
 			monitores = 0;
 			humoflag = 0;
-			nuevo = 0;
+			nuevo = 1;
 		}
 	}	
 
