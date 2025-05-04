@@ -38,8 +38,7 @@
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow *window, double xPos, double yPos);
 void DoMovement();
-void MonitorAnimation();
-void Animation(); //Funci�n para los frames 
+void Animation();
 
 // Window dimensions
 const GLuint WIDTH = 1500, HEIGHT = 650;
@@ -470,7 +469,7 @@ int main()
 	Model mouse((char*)"Models/mouse/mouse.obj");
 	Model cpu((char*)"Models/CPU/CPU.obj");
 	Model pizarra((char*)"Models/pizarra/pizarra.obj");
-	Model Puer((char*)"Models/puertaA/model.obj");
+	Model Puer((char*)"Models/puertaA/puertaAzul.obj");
 	Model neon((char*)"Models/TirasAzules/TirasAzules.obj");
 
 	Model humo((char*)"Models/humo/humo.obj");
@@ -680,8 +679,6 @@ int main()
 		DoMovement();
 		Animation();
 
-		MonitorAnimation();
-
 		// Clear the colorbuffer
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -832,6 +829,7 @@ int main()
 		glm::mat4 model1(1);
 		glm::mat4 model2(1);
 		glm::mat4 moni(1);
+		glm::mat4 ratoncito(1); // Declara esta variable una sola vez fuera de los bucles
 
 		//Carga de modelo 
 		view = camera.GetViewMatrix();
@@ -857,12 +855,14 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Salon.Draw(lightingShader);
-		/*prueba.Draw(lightingShader);*/
+
+		puerta = model;
+		puerta = glm::translate(puerta, glm::vec3(0.001f, 0.001f, 0.0f));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(puerta));
+		Puer.Draw(lightingShader);
+		//frente
 	
-			
-			
-
-
 	if(!nuevo){
 		humoPosX = 0;
 		humoPosY = 1.0 * 10 * 0.0012;
@@ -890,17 +890,6 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
 		pizarra.Draw(lightingShader);
-
-		puerta = model;
-		puerta = glm::scale(puerta, glm::vec3(0.1f, 0.1f, 0.1f));
-		puerta = glm::translate(puerta, glm::vec3(-0.9f, 0.32f, -1.72f));
-		puerta = glm::rotate(puerta, glm::radians(6.8f), glm::vec3(0.0f, 1.0f, 0.0f));
-		puerta = glm::scale(puerta, glm::vec3(1.1f, 1.2f, 1.1f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(puerta));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(puerta));
-		Puer.Draw(lightingShader);
-		//frente
 
 		modelTemp = model;
 		modelTemp = glm::scale(modelTemp, glm::vec3(0.0015f, 0.0015f, 0.0015f));
@@ -1174,6 +1163,12 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
+
+		// Añadir el mouse junto al teclado
+		ratoncito = tecla;
+		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
+		mouse.Draw(lightingShader);
 		///////////////
 		moni = glm::translate(pivotecompus, glm::vec3(-55/monitor2, 0.0f, filab / monitor2));
 		moni = glm::scale(moni, glm::vec3(monitor2, monitor2, monitor2));
@@ -1186,6 +1181,12 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
+		// Añadir el mouse junto al teclado
+		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
+		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
+		mouse.Draw(lightingShader);
+
 		///////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(-55, 0.0f, filac));
 		moni = glm::scale(moni, glm::vec3(monitor3, monitor3, monitor3));
@@ -1197,6 +1198,12 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
+
+		// Añadir el mouse junto al teclado
+		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
+		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
+		mouse.Draw(lightingShader);
 		///////////////////
 
 		moni = glm::translate(pivotecompus, glm::vec3(-30, 0.0f, filaa));
@@ -1210,6 +1217,12 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
+		// Añadir el mouse junto al teclado
+		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
+		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
+		mouse.Draw(lightingShader);;
+
 		/////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(-30, 0.0f, filab));
 		moni = glm::scale(moni, glm::vec3(monitor5, monitor5, monitor5));
@@ -1221,6 +1234,12 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
+
+		// Añadir el mouse junto al teclado
+		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
+		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
+		mouse.Draw(lightingShader);
 		///////////////
 		moni = glm::translate(pivotecompus, glm::vec3(-30, 0.0f, filac));
 		moni = glm::scale(moni, glm::vec3(monitor6, monitor6, monitor6));
@@ -1232,6 +1251,12 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
+
+		// Añadir el mouse junto al teclado
+		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
+		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
+		mouse.Draw(lightingShader);
 
 		////////cpus de mesa de adelante
 		CU = glm::translate(CPUpiv, glm::vec3(-14.5f * 10, 0.0f, -14.0f * 10));
@@ -1299,6 +1324,12 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
+
+		// Añadir el mouse junto al teclado
+		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
+		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
+		mouse.Draw(lightingShader);
 		////////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(45, 0.0f, filab));
 		moni = glm::scale(moni, glm::vec3(monitor8, monitor8, monitor8));
@@ -1310,6 +1341,12 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
+
+		// Añadir el mouse junto al teclado
+		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
+		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
+		mouse.Draw(lightingShader);
 		///////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(45, 0.0f, filac));
 		moni = glm::scale(moni, glm::vec3(monitor9, monitor9, monitor9));
@@ -1321,6 +1358,12 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
+
+		// Añadir el mouse junto al teclado
+		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
+		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
+		mouse.Draw(lightingShader);
 		////////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(17, 0.0f, filaa));
 		moni = glm::scale(moni, glm::vec3(monitor10, monitor10, monitor10));
@@ -1333,6 +1376,11 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
+		// Añadir el mouse junto al teclado
+		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
+		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
+		mouse.Draw(lightingShader);
 		////////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(17, 0.0f, filab));
 		moni = glm::scale(moni, glm::vec3(monitor11, monitor11, monitor11));
@@ -1345,6 +1393,11 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
 
+		// Añadir el mouse junto al teclado
+		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
+		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
+		mouse.Draw(lightingShader);
 		///////////////////////////////
 		moni = glm::translate(pivotecompus, glm::vec3(17, 0.0f, filac));
 		moni = glm::scale(moni, glm::vec3(monitor12, monitor12, monitor12));
@@ -1356,6 +1409,12 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 		teclado.Draw(lightingShader);
+
+		// Añadir el mouse junto al teclado
+		ratoncito = glm::translate(tecla, glm::vec3(15.0f, 0.0f, -5.0f));
+		ratoncito = glm::scale(ratoncito, glm::vec3(0.8f, 0.8f, 0.8f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(ratoncito));
+		mouse.Draw(lightingShader);
 		/////////////////////////
 
 		////////cpus de mesa de adelante
@@ -1446,17 +1505,6 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
 		tele.Draw(lightingShader);
-
-		puerta = model;
-		puerta = glm::scale(puerta, glm::vec3(0.1f, 0.1f, 0.1f));
-		puerta = glm::translate(puerta, glm::vec3(-0.9f, 0.32f, -1.72f));
-		puerta = glm::rotate(puerta, glm::radians(6.8f), glm::vec3(0.0f, 1.0f, 0.0f));
-		puerta = glm::scale(puerta, glm::vec3(1.1f, 1.2f, 1.1f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(puerta));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(puerta));
-		Puer.Draw(lightingShader);
-		//frente
 
 		modelTemp = model;
 		modelTemp = glm::scale(modelTemp, glm::vec3(0.08f, 0.08f, 0.08f));
@@ -1991,8 +2039,8 @@ int main()
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		// Aplicar esta matriz específica al shader
-		modelVentana = glm::translate(modelVentana, glm::vec3(0.0f, -0.02f, 0.0f));
-		modelVentana = glm::scale(modelVentana, glm::vec3(10.0f, 10.0f, 10.0f));
+		modelVentana = glm::translate(modelVentana, glm::vec3(0.0f, 0.0f, 0.0f));
+		modelVentana = glm::scale(modelVentana, glm::vec3(10.0f, 9.604f, 10.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelVentana));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
 		ventanas.Draw(lightingShader);
@@ -2082,14 +2130,13 @@ void DoMovement()
 
 	if (keys[GLFW_KEY_X])
 	{
-
 		monitores = 1;
+		humoflag = 1;
 	}
-	if (keys[GLFW_KEY_Z])
+	/*if (keys[GLFW_KEY_Z])
 	{
-
 		humoflag =1;
-	}
+	}*/
 
 }
 
@@ -2115,18 +2162,6 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 		}
 
 	}
-
-	if (key == GLFW_KEY_M && action == GLFW_PRESS) {
-		// Tecla 'M' para iniciar/reiniciar la animaci�n de monitores
-		monitorAnimationActive = true;
-		monitorAnimationState = 0;
-		oldMonitorScale = 1.0f;
-		newMonitorScale = 0.0f;
-		monitorAnimFrame = 0;
-		nuevo = 0; // Asegurar que empezamos mostrando el laboratorio viejo
-	}
-
-
 
 
 	if (key == GLFW_KEY_K && GLFW_PRESS == action)
@@ -2306,138 +2341,125 @@ void Animation() {
 
 		}
 	}
-		else {
-			if (monitor1 < 1) {
-				monitor1 += 0.01;
-			}
-			else if (monitor2 < 1) {
-
-				monitor2 += 0.01;
-
-			}
-			else if (monitor3 < 1) {
-
-				monitor3 += 0.01;
-
-			}
-			else if (monitor4 < 1) {
-				monitor4 += 0.01;
-
-			}
-			else if (monitor4 < 1) {
-				monitor4 += 0.01;
-
-			}
-			else if (monitor5 < 1) {
-				monitor5 += 0.01;
-
-			}
-			else if (monitor6 < 1) {
-				monitor6 += 0.01;
-
-			}
-			else if (monitor7 < 1) {
-				monitor7 += 0.01;
-
-			}
-			else if (monitor8 < 1) {
-				monitor8 += 0.01;
-
-			}
-			else if (monitor9 < 1) {
-				monitor9 += 0.01;
-
-			}
-			else if (monitor10 < 1) {
-				monitor10 += 0.01;
-
-			}
-			else if (monitor11 < 1) {
-				monitor11 += 0.01;
-
-			}
-			else if (monitor12 < 1) {
-				monitor12 += 0.01;
-
-			}else if (silla1 < 1) {
-				silla1 += 0.01;
-			}
-			else if (silla222 < 1) {
-				silla222 += 0.01;
-			}
-			else if (silla3 < 1) {
-				silla3 += 0.01;
-			}
-			else if (silla4 < 1) {
-				silla4 += 0.01;
-			}
-			else if (silla5 < 1) {
-				silla5 += 0.01;
-			}
-			else if (silla6 < 1) {
-				silla6 += 0.01;
-			}
-			else if (silla7 < 1) {
-				silla7 += 0.01;
-			}
-			else if (silla8 < 1) {
-				silla8 += 0.01;
-			}
-			else if (silla9 < 1) {
-				silla9 += 0.01;
-			}
-			else if (silla10 < 1) {
-				silla10 += 0.01;
-			}
-			else if (silla11 < 1) {
-				silla11 += 0.01;
-			}
-			else if (silla12 < 1) {
-				silla12 += 0.01;
-			}
-			else if (silla13 < 1) {
-				silla13 += 0.01;
-			}
-			else if (silla14 < 1) {
-				silla14 += 0.01;
-			}
-			else if (silla15 < 1) {
-				silla15 += 0.01;
-			}
-			else if (silla16 < 1) {
-				silla16 += 0.01;
-			}
-			else if (silla17 < 1) {
-				silla17 += 0.01;
-			}
-			else if (silla18 < 1) {
-				silla18 += 0.01;
-			}
-			else if (silla19 < 1) {
-				silla19 += 0.01;
-			}
-			else if (silla20 < 1) {
-				silla20 += 0.01;
-			}
-			else if (silla21 < 1) {
-				silla21 += 0.01;
-			}
-			else if (silla22 < 1) {
-				silla22 += 0.01;
-			}
-			else if (silla23 < 1) {
-				silla23 += 0.01;
-			}
-			else if (silla24 < 1) {
-				silla24 += 0.01;
-			}
-
+	else {
+		if (monitor1 < 1) {
+			monitor1 += 0.01;
 		}
-	
+		else if (monitor2 < 1) {
+			monitor2 += 0.01;
+		}
+		else if (monitor3 < 1) {
+			monitor3 += 0.01;
+		}
+		else if (monitor4 < 1) {
+			monitor4 += 0.01;
+		}
+		else if (monitor4 < 1) {
+			monitor4 += 0.01;
+		}
+		else if (monitor5 < 1) {
+			monitor5 += 0.01;
+		}
+		else if (monitor6 < 1) {
+			monitor6 += 0.01;
+		}
+		else if (monitor7 < 1) {
+			monitor7 += 0.01;
+		}
+		else if (monitor8 < 1) {
+			monitor8 += 0.01;
+		}
+		else if (monitor9 < 1) {
+			monitor9 += 0.01;
+		}
+		else if (monitor10 < 1) {
+			monitor10 += 0.01;
+		}
+		else if (monitor11 < 1) {
+			monitor11 += 0.01;
+		}
+		else if (monitor12 < 1) {
+			monitor12 += 0.01;
+		}else if (silla1 < 1) {
+			silla1 += 0.01;
+		}
+		else if (silla222 < 1) {
+			silla222 += 0.01;
+		}
+		else if (silla3 < 1) {
+			silla3 += 0.01;
+		}
+		else if (silla4 < 1) {
+			silla4 += 0.01;
+		}
+		else if (silla5 < 1) {
+			silla5 += 0.01;
+		}
+		else if (silla6 < 1) {
+			silla6 += 0.01;
+		}
+		else if (silla7 < 1) {
+			silla7 += 0.01;
+		}
+		else if (silla8 < 1) {
+			silla8 += 0.01;
+		}
+		else if (silla9 < 1) {
+			silla9 += 0.01;
+		}
+		else if (silla10 < 1) {
+			silla10 += 0.01;
+		}
+		else if (silla11 < 1) {
+			silla11 += 0.01;
+		}
+		else if (silla12 < 1) {
+			silla12 += 0.01;
+		}
+		else if (silla13 < 1) {
+			silla13 += 0.01;
+		}
+		else if (silla14 < 1) {
+			silla14 += 0.01;
+		}
+		else if (silla15 < 1) {
+			silla15 += 0.01;
+		}
+		else if (silla16 < 1) {
+			silla16 += 0.01;
+		}
+		else if (silla17 < 1) {
+			silla17 += 0.01;
+		}
+		else if (silla18 < 1) {
+			silla18 += 0.01;
+		}
+		else if (silla19 < 1) {
+			silla19 += 0.01;
+		}
+		else if (silla20 < 1) {
+			silla20 += 0.01;
+		}
+		else if (silla21 < 1) {
+			silla21 += 0.01;
+		}
+		else if (silla22 < 1) {
+			silla22 += 0.01;
+		}
+		else if (silla23 < 1) {
+			silla23 += 0.01;
+		}
+		else if (silla24 < 1) {
+			silla24 += 0.01;
+		}
+		else {
+			monitores = 0;
+			humoflag = 0;
+			nuevo = 0;
+		}
+	}	
 
-	
-
-if (humoflag) {
+	if (humoflag) {
 		
 		float rango = 40.0;
 		rhumo += 0.1;
@@ -2567,11 +2589,7 @@ if (humoflag) {
 					H[1].size = glm::vec3(contadorhumo4, contadorhumo4 * 2, contadorhumo4);
 					H[2].size = glm::vec3(contadorhumo6, contadorhumo6 * 2, contadorhumo6);
 					H[3].size = glm::vec3(contadorhumo8, contadorhumo8 * 2, contadorhumo8);
-				}
-			
-			
-
-			
+			}			
 	}
 
 
@@ -2615,43 +2633,43 @@ if (humoflag) {
 
 }
 
-void MonitorAnimation() {
-	if (!monitorAnimationActive) return;
-
-	// Ya estamos en laboratorio nuevo pero seguimos mostrando la animaci�n de monitores
-	if (nuevo == 1) {
-		// Transici�n de monitores viejos a monitores nuevos (en lab nuevo)
-		if (monitorAnimationState == 1) {
-			// En el lab nuevo, empezamos con los monitores ocultos y los hacemos aparecer
-			newMonitorScale = (float)monitorAnimFrame / MONITOR_ANIM_MAX_FRAMES;
-
-			monitorAnimFrame++;
-			if (monitorAnimFrame >= MONITOR_ANIM_MAX_FRAMES) {
-				// La animaci�n ha terminado
-				monitorAnimationActive = false;
-				newMonitorScale = 1.0f;  // Monitores nuevos completamente visibles
-			}
-		}
-	}
-	else {
-		// Todav�a estamos en laboratorio viejo, hacemos la transici�n normal
-		if (monitorAnimationState == 0) {
-			// Desvaneciendo monitores viejos
-			
-
-			monitorAnimFrame++;
-			if (monitorAnimFrame >= MONITOR_ANIM_MAX_FRAMES * 3) {
-				monitorAnimFrame = 0;
-				monitorAnimationState = 1;
-
-				// Aqu� cambiamos al laboratorio nuevo justo despu�s de desvanecer los viejos
-				oldMonitorScale = 0.0f;
-				newMonitorScale = 0.0f;  // Empezamos con monitores nuevos ocultos
-				nuevo = 1;  // Cambiamos al laboratorio nuevo
-			}
-		}
-	}
-}
+//void MonitorAnimation() {
+//	if (!monitorAnimationActive) return;
+//
+//	// Ya estamos en laboratorio nuevo pero seguimos mostrando la animaci�n de monitores
+//	if (nuevo == 1) {
+//		// Transici�n de monitores viejos a monitores nuevos (en lab nuevo)
+//		if (monitorAnimationState == 1) {
+//			// En el lab nuevo, empezamos con los monitores ocultos y los hacemos aparecer
+//			newMonitorScale = (float)monitorAnimFrame / MONITOR_ANIM_MAX_FRAMES;
+//
+//			monitorAnimFrame++;
+//			if (monitorAnimFrame >= MONITOR_ANIM_MAX_FRAMES) {
+//				// La animaci�n ha terminado
+//				monitorAnimationActive = false;
+//				newMonitorScale = 1.0f;  // Monitores nuevos completamente visibles
+//			}
+//		}
+//	}
+//	else {
+//		// Todav�a estamos en laboratorio viejo, hacemos la transici�n normal
+//		if (monitorAnimationState == 0) {
+//			// Desvaneciendo monitores viejos
+//			
+//
+//			monitorAnimFrame++;
+//			if (monitorAnimFrame >= MONITOR_ANIM_MAX_FRAMES * 3) {
+//				monitorAnimFrame = 0;
+//				monitorAnimationState = 1;
+//
+//				// Aqu� cambiamos al laboratorio nuevo justo despu�s de desvanecer los viejos
+//				oldMonitorScale = 0.0f;
+//				newMonitorScale = 0.0f;  // Empezamos con monitores nuevos ocultos
+//				nuevo = 1;  // Cambiamos al laboratorio nuevo
+//			}
+//		}
+//	}
+//}
 
 void MouseCallback(GLFWwindow *window, double xPos, double yPos)
 {
