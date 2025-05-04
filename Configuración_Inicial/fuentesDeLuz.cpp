@@ -460,12 +460,11 @@ int main()
 	Shader lampShader("Shader/lamp.vs", "Shader/lamp.frag");
 	Shader skyboxshader("Shader/SkyBox.vs", "Shader/SkyBox.frag");
 
-	Model mesa((char*)"Models/mesa/mesa.obj");
-	Model Moon((char*)"Models/Moon/moon.obj");
-	//Model focos((char*)"Models/tele/pizarron.obj");
 	Model Salon((char*)"Models/Salon1/salon.obj");
-	Model silla((char*)"Models/chair1/chair1.obj");
+	Model ventanas((char*)"Models/Salon1/VentanaSalon.obj");
 
+	Model mesa((char*)"Models/mesa/mesa.obj");
+	Model silla((char*)"Models/chair1/chair1.obj");
 	Model monitor((char*)"Models/monitor/monitor.obj");
 	Model teclado((char*)"Models/keyboard/keyboard.obj");
 	Model mouse((char*)"Models/mouse/mouse.obj");
@@ -481,8 +480,8 @@ int main()
 	Model silla2((char*)"Models/GamerChair/GamerChair.obj");
 	Model moniGamer((char*)"Models/MonitorNew/model.obj");
 	Model servidor((char*)"Models/Rack/model.obj");
+	Model servidor2((char*)"Models/Rack/Rack.obj");
 	Model lampara((char*)"Models/lamp/lamp.obj");
-	Model prueba((char*)"Models/Pruebas/model.obj");
 
 	////////////////////////// KEYFRAMES //////////////////////////////////
 
@@ -829,6 +828,7 @@ int main()
 		glm::mat4 Rackpiv = glm::mat4(1.0f); //Temp
 
 		glm::mat4 model(1);
+		glm::mat4 modelVentana(1);
 		glm::mat4 model1(1);
 		glm::mat4 model2(1);
 		glm::mat4 moni(1);
@@ -836,6 +836,7 @@ int main()
 		//Carga de modelo 
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
+		modelVentana = glm::mat4(1);
 		model1 = glm::mat4(1);
 		model2 = glm::mat4(1);
 		moni = glm::mat4(1);
@@ -847,7 +848,6 @@ int main()
 		glm::mat4 pizarron = glm::mat4(1);
 		glm::mat4 puerta = glm::mat4(1);
 		glm::mat4 rack = glm::mat4(1.0f);
-		glm::mat4 luna = glm::mat4(1);
 		glm::mat4 hum = glm::mat4(1);
 
 		glm::mat4 neon1 = glm::mat4(1);
@@ -1939,6 +1939,22 @@ int main()
 		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 		//cpu.Draw(lightingShader);
 
+		glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+		// Rack transparente
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
+		servidor2.Draw(lightingShader);
+
+		// Restaura configuración normal
+		glDisable(GL_BLEND);
+
+		glBindVertexArray(0);
 
 	}
 	
@@ -1952,12 +1968,6 @@ int main()
 		// Set matrices
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(lightPos.x, lightPos.y, lightPos.z));
-		model = glm::scale(model, glm::vec3(0.003f)); // Make it a smaller cube
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Moon.Draw(lampShader);
-		glBindVertexArray(VAO);
 	
 		glBindVertexArray(0);
 
@@ -1975,6 +1985,20 @@ int main()
 		glBindVertexArray(0);
 		glDepthFunc(GL_LESS);
 
+		// Ventana transparente
+		lightingShader.Use();
+		glEnable(GL_BLEND); // Activa la funcionalidad para trabajar el canal alfa
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// Aplicar esta matriz específica al shader
+		modelVentana = glm::translate(modelVentana, glm::vec3(0.0f, -0.02f, 0.0f));
+		modelVentana = glm::scale(modelVentana, glm::vec3(10.0f, 10.0f, 10.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelVentana));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
+		ventanas.Draw(lightingShader);
+
+		// Restaura configuración normal
+		glDisable(GL_BLEND);
 
 		// Swap the buffers
 		glDeleteVertexArrays(1, &VAO);
@@ -2054,15 +2078,6 @@ void DoMovement()
 	if (keys[GLFW_KEY_J])
 	{
 		mz += 0.01f;
-	}
-
-	
-	
-
-	if (keys[GLFW_KEY_O])
-	{
-		printf("%f,%f,%f \n", mx,my, mz);
-		
 	}
 
 	if (keys[GLFW_KEY_X])
@@ -2431,25 +2446,25 @@ if (humoflag) {
 				contadorhumo2 = 0.000001f;
 				contadorhumo1= 0;
 
-				printf("111111111111111111111111111111");
+				//printf("111111111111111111111111111111");
 			}
 			if (contadorhumo3 >= rango){
 				contadorhumo4 = 0.000001f;
 				contadorhumo3 = 0;
 
-				printf("2222222222222222222222222222");
+				//printf("2222222222222222222222222222");
 			}
 			if (contadorhumo5 >= rango){
 				contadorhumo6 = 0.000001f;
 				contadorhumo5 = 0;
 
-				printf("3333333333333333333333333333333");
+				//printf("3333333333333333333333333333333");
 			}
 			if (contadorhumo7 >= rango) {
 				contadorhumo8 = 0.000001f;
 				contadorhumo7 = 0;
 
-				printf("444444444444444444444444444444444");
+				//printf("444444444444444444444444444444444");
 			}
 			if (contadorhumo9>= rango) {
 				contadorhumo10 = 0.000001f;
