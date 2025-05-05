@@ -4,7 +4,12 @@
 * INTEGRANTES:
 * Berdejo Guzm�n Leonardo Ariel
 * Javier Antonio Rodriguez Garcia
+* Santiago Adrián Cruz Hernández
 */
+#include <windows.h>
+#include <mmsystem.h>
+#pragma comment(lib, "winmm.lib")
+
 
 #include <string>
 #include <iostream>
@@ -38,7 +43,7 @@
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 void DoMovement();
-void Animation();
+void Animation(); //Funci�n para los frames 
 
 // Window dimensions
 const GLuint WIDTH = 1500, HEIGHT = 650;
@@ -59,7 +64,10 @@ GLfloat lastFrame = 0.0f;  	// Time of last frame
 glm::vec3 lightPos(0.0f, 0.0f, 5.0f);
 bool active;
 int flag = 0;
-
+bool hablar = false, musica1 = false, muica2 = false, musica3 = false, musicafinal = false, musicaCambio = false;
+float tex1, tex2, tex3;
+float tiempoTexto= 0.0f;
+float contexto = 3.5f;
 int flagg = 1;
 int luz1 = 0;
 int luz2 = 0;
@@ -144,6 +152,10 @@ float RLegs = 0.0f;
 float head = 0.0f;
 float tail = 0.0f;
 
+
+
+
+
 float radio = 0.0f;  // Radio del c�rculo
 float angle = 0.0f;  // �ngulo inicial
 bool moveRot = false;
@@ -220,38 +232,47 @@ float teclado12 = 1.0f;
 
 
 //Modificar estos KeyFrames pues es para cada animaci�n
-float dogPosX, dogPosY, dogPosZ;
 
-#define MAX_FRAMES 50
-int i_max_steps = 190;
+float poshumanox = 0.0f;
+float poshumanoy = 122.055f;
+float poshumanoz = 0.0f;
+float RodillasI = 0.0f;
+float RodillaD = 0.0f;
+float HombroI = 0.0f;
+float HombroD = 0.0f;
+float PiernaI = 0.0f;
+float PiernaD = 0.0f;
+float RotHuman = 0.0f;
+
+#define MAX_FRAMES 90
+int i_max_steps = 90;
 int i_curr_steps = 0;
 float mx = 0, my = 0, mz = 0;
 //-----------------------Definici�n de la estructura para los KeyFrames-----------------------
 typedef struct _frame {
 
-	float rotDog;
-	float rotDogInc;
-	float dogPosX;
-	float dogPosY;
-	float dogPosZ;
-	float incX;
-	float incY;
-	float incZ;
-	float head;
-	float headInc;
-	float tail;
-	float tailInc;
-	float FLegs;
-	float FLegsInc;
-	float FLegsL;
-	float FLegsLInc;
-	float FLegsR;
-	float FLegsRInc;
-	float RLegs;
-	float RLegsInc;
-	//Variables para la rotaci�n
-	float rotDogX;
-	float rotDogXInc;
+	float poshumanox = 0.0f;
+	float poshumanoy = 0.0f;
+	float poshumanoz = 0.0f;
+	float RodillasI = 0.0f;
+	float RodillaD = 0.0f;
+	float HombroI = 0.0f;
+	float HombroD = 0.0f;
+	float PiernaI = 0.0f;
+	float PiernaD = 0.0f;
+	float RotHuman = 0.0f;
+	
+	float poshumanoxInc = 0.0f;
+	float poshumanoyInc = 0.0f;
+	float poshumanozInc = 0.0f;
+	float RodillasIInc = 0.0f;
+	float RodillaDInc = 0.0f;
+	float HombroIInc = 0.0f;
+	float HombroDInc = 0.0f;
+	float PiernaIInc = 0.0f;
+	float PiernaDInc = 0.0f;
+	float RotHumanInc = 0.0f;
+
 
 
 }FRAME;
@@ -260,7 +281,7 @@ FRAME KeyFrame[MAX_FRAMES];
 int FrameIndex = 0;			//En qu� lugar de la l�nea de tiempo me encuentro al guardar los datos
 bool play = false;			//Si se est� reproduciendo la animaci�n
 int playIndex = 0;			//En qu� lugar de la l�nea de tiempo me encuentro al estar reproduciendo la animaci�n
-bool humoflag = false;
+bool humoflag = true;
 //flag1
 struct Particle {
 	glm::vec3 position;
@@ -276,23 +297,6 @@ void spawnParticle(int i, float x, float y, float z, float sizehumoxz, float siz
 	H[i] = p;
 }
 
-//void updateParticles(float deltaTime) {
-//	for (auto& p : particles) {
-//		p.life -= deltaTime;
-//		if (p.life > 0.0f) {
-//			p.position += p.velocity * deltaTime;
-//		}
-//	}
-//	// Eliminar part�culas muertas
-//	particles.erase(std::remove_if(particles.begin(), particles.end(),
-//		[](const Particle& p) { return p.life <= 0.0f; }), particles.end());
-//}
-void renderParticles(glm::mat4 hum) {
-
-
-
-}
-
 // Funci�n para guardar la animaci�n
 void SaveAnimation(const char* filename = "Animacion.txt") {
 	std::ofstream file(filename);
@@ -302,17 +306,16 @@ void SaveAnimation(const char* filename = "Animacion.txt") {
 	}
 
 	for (int i = 0; i < FrameIndex; i++) {
-		file << KeyFrame[i].dogPosX << " "
-			<< KeyFrame[i].dogPosY << " "
-			<< KeyFrame[i].dogPosZ << " "
-			<< KeyFrame[i].rotDog << " "
-			<< KeyFrame[i].head << " "
-			<< KeyFrame[i].tail << " "
-			<< KeyFrame[i].FLegs << " "
-			<< KeyFrame[i].FLegsL << " "
-			<< KeyFrame[i].FLegsR << " "
-			<< KeyFrame[i].RLegs << " "
-			<< KeyFrame[i].rotDogX << "\n";
+		file << KeyFrame[i].poshumanox << " "
+			<< KeyFrame[i].poshumanoy << " "
+			<< KeyFrame[i].poshumanoz << " "
+			<< KeyFrame[i].RodillasI << " "
+			<< KeyFrame[i].RodillaD << " "
+			<< KeyFrame[i].HombroI << " "
+			<< KeyFrame[i].HombroD << " "
+			<< KeyFrame[i].PiernaI << " "
+			<< KeyFrame[i].PiernaD << " "
+			<< KeyFrame[i].RotHuman << "\n";	
 	}
 	file.close();
 	std::cout << "Animacion guardada correctamente." << std::endl;
@@ -328,17 +331,17 @@ void LoadAnimation(const char* filename = "Animacion.txt") {
 
 	FrameIndex = 0;
 	while (FrameIndex < MAX_FRAMES &&
-		file >> KeyFrame[FrameIndex].dogPosX
-		>> KeyFrame[FrameIndex].dogPosY
-		>> KeyFrame[FrameIndex].dogPosZ
-		>> KeyFrame[FrameIndex].rotDog
-		>> KeyFrame[FrameIndex].head
-		>> KeyFrame[FrameIndex].tail
-		>> KeyFrame[FrameIndex].FLegs
-		>> KeyFrame[FrameIndex].FLegsL
-		>> KeyFrame[FrameIndex].FLegsR
-		>> KeyFrame[FrameIndex].RLegs
-		>> KeyFrame[FrameIndex].rotDogX) {
+		file >> KeyFrame[FrameIndex].poshumanox
+		>> KeyFrame[FrameIndex].poshumanoy
+		>> KeyFrame[FrameIndex].poshumanoz
+		>> KeyFrame[FrameIndex].RodillasI
+		>> KeyFrame[FrameIndex].RodillaD
+		>> KeyFrame[FrameIndex].HombroI
+		>> KeyFrame[FrameIndex].HombroD
+		>> KeyFrame[FrameIndex].PiernaI
+		>> KeyFrame[FrameIndex].PiernaD
+		>> KeyFrame[FrameIndex].RotHuman)
+		 {
 		FrameIndex++;
 	}
 }
@@ -364,58 +367,60 @@ void saveFrame(void)
 
 	printf("frameindex %d\n", FrameIndex);
 
-	KeyFrame[FrameIndex].dogPosX = dogPosX;
-	KeyFrame[FrameIndex].dogPosY = dogPosY;
-	KeyFrame[FrameIndex].dogPosZ = dogPosZ;
+	KeyFrame[FrameIndex].poshumanox = poshumanox;
+	KeyFrame[FrameIndex].poshumanoy = poshumanoy;
+	KeyFrame[FrameIndex].poshumanoz = poshumanoz;
 
-	KeyFrame[FrameIndex].rotDog = rotDog;
-	KeyFrame[FrameIndex].rotDogX = rotDogX;
+	KeyFrame[FrameIndex].RodillasI = RodillasI;
+	KeyFrame[FrameIndex].RodillaD = RodillaD;
+	KeyFrame[FrameIndex].HombroI = HombroI;
+	KeyFrame[FrameIndex].HombroD = HombroD;
+	KeyFrame[FrameIndex].PiernaI = PiernaI;
+	KeyFrame[FrameIndex].PiernaD = PiernaD;
 
-	KeyFrame[FrameIndex].head = head;
-	KeyFrame[FrameIndex].tail = tail;
-	KeyFrame[FrameIndex].FLegs = FLegs;
-	KeyFrame[FrameIndex].FLegsL = FLegsL;
-	KeyFrame[FrameIndex].FLegsR = FLegsR;
-	KeyFrame[FrameIndex].RLegs = RLegs;
+	KeyFrame[FrameIndex].RotHuman = RotHuman;
+
 
 	FrameIndex++;
 }
 
 void resetElements(void)
 {
-	dogPosX = KeyFrame[0].dogPosX;
-	dogPosY = KeyFrame[0].dogPosY;
-	dogPosZ = KeyFrame[0].dogPosZ;
+	
+	poshumanox = KeyFrame[0].poshumanox;
+	poshumanoy = KeyFrame[0].poshumanoy;
+	poshumanoz = KeyFrame[0].poshumanoz;
 
-	head = KeyFrame[0].head;
-	tail = KeyFrame[0].tail;
-	FLegs = KeyFrame[0].FLegs;
-	FLegsL = KeyFrame[0].FLegsL;
-	FLegsR = KeyFrame[0].FLegsR;
-	RLegs = KeyFrame[0].RLegs;
+	RodillasI = KeyFrame[0].RodillasI;
+	RodillaD = KeyFrame[0].RodillaD;
+	HombroI = KeyFrame[0].HombroI;
+	HombroD = KeyFrame[0].HombroD;
+	PiernaI = KeyFrame[0].PiernaI;
+	PiernaD = KeyFrame[0].PiernaD;
 
-	rotDog = KeyFrame[0].rotDog;
-	rotDogX = KeyFrame[0].rotDogX;
+	RotHuman = KeyFrame[0].RotHuman;
+
 
 }
 void interpolation(void)
 {
 
-	KeyFrame[playIndex].incX = (KeyFrame[playIndex + 1].dogPosX - KeyFrame[playIndex].dogPosX) / i_max_steps;
-	KeyFrame[playIndex].incY = (KeyFrame[playIndex + 1].dogPosY - KeyFrame[playIndex].dogPosY) / i_max_steps;
-	KeyFrame[playIndex].incZ = (KeyFrame[playIndex + 1].dogPosZ - KeyFrame[playIndex].dogPosZ) / i_max_steps;
 
-	KeyFrame[playIndex].headInc = (KeyFrame[playIndex + 1].head - KeyFrame[playIndex].head) / i_max_steps;
-	KeyFrame[playIndex].tailInc = (KeyFrame[playIndex + 1].tail - KeyFrame[playIndex].tail) / i_max_steps;
-	KeyFrame[playIndex].FLegsInc = (KeyFrame[playIndex + 1].FLegs - KeyFrame[playIndex].FLegs) / i_max_steps;
-	KeyFrame[playIndex].FLegsLInc = (KeyFrame[playIndex + 1].FLegsL - KeyFrame[playIndex].FLegsL) / i_max_steps;
-	KeyFrame[playIndex].FLegsRInc = (KeyFrame[playIndex + 1].FLegsR - KeyFrame[playIndex].FLegsR) / i_max_steps;
-	KeyFrame[playIndex].RLegsInc = (KeyFrame[playIndex + 1].RLegs - KeyFrame[playIndex].RLegs) / i_max_steps;
+	KeyFrame[playIndex].poshumanoxInc = (KeyFrame[playIndex + 1].poshumanox - KeyFrame[playIndex].poshumanox) / i_max_steps;
+	KeyFrame[playIndex].poshumanoyInc = (KeyFrame[playIndex + 1].poshumanoy - KeyFrame[playIndex].poshumanoy) / i_max_steps;
+	KeyFrame[playIndex].poshumanozInc = (KeyFrame[playIndex + 1].poshumanoz - KeyFrame[playIndex].poshumanoz) / i_max_steps;
 
-	KeyFrame[playIndex].rotDogInc = (KeyFrame[playIndex + 1].rotDog - KeyFrame[playIndex].rotDog) / i_max_steps;
-	KeyFrame[playIndex].rotDogXInc = (KeyFrame[playIndex + 1].rotDogX - KeyFrame[playIndex].rotDogX) / i_max_steps;
+	KeyFrame[playIndex].RodillasIInc = (KeyFrame[playIndex + 1].RodillasI - KeyFrame[playIndex].RodillasI) / i_max_steps;
+	KeyFrame[playIndex].RodillaDInc = (KeyFrame[playIndex + 1].RodillaD - KeyFrame[playIndex].RodillaD) / i_max_steps;
+	KeyFrame[playIndex].HombroIInc = (KeyFrame[playIndex + 1].HombroI - KeyFrame[playIndex].HombroI) / i_max_steps;
+	KeyFrame[playIndex].HombroDInc = (KeyFrame[playIndex + 1].HombroD - KeyFrame[playIndex].HombroD) / i_max_steps;
+	KeyFrame[playIndex].PiernaIInc = (KeyFrame[playIndex + 1].PiernaI - KeyFrame[playIndex].PiernaI) / i_max_steps;
+	KeyFrame[playIndex].PiernaDInc = (KeyFrame[playIndex + 1].PiernaD - KeyFrame[playIndex].PiernaD) / i_max_steps;
 
-	printf("Interpolando cuadro %d a %d: IncX = %f\n", playIndex, playIndex + 1, KeyFrame[playIndex].incX);
+	KeyFrame[playIndex].RotHumanInc = (KeyFrame[playIndex + 1].RotHuman - KeyFrame[playIndex].RotHuman) / i_max_steps;
+
+
+	//printf("Interpolando cuadro %d a %d: IncX = %f\n", playIndex, playIndex + 1, KeyFrame[playIndex].incX);
 }
 //////////////////////////////////// FIN FRAMES ///////////////////////////////
 
@@ -455,6 +460,7 @@ int main()
 	// GLFW Options
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+
 	// Set this to true so GLEW knows to use a modern approach to retrieving function pointers and extensions
 	glewExperimental = GL_TRUE;
 	// Initialize GLEW to setup the OpenGL Function pointers
@@ -485,6 +491,9 @@ int main()
 	Model pizarra((char*)"Models/pizarra/pizarra.obj");
 	Model Puer((char*)"Models/puertaA/puertaAzul.obj");
 	Model neon((char*)"Models/TirasAzules/TirasAzules.obj");
+	Model EscritorioP((char*)"Models/escritorioProf/escritorioProf.obj");
+
+	Model EscritorioPnew((char*)"Models/escritorioProfNew/escritorioProfNew.obj");
 
 	Model humo((char*)"Models/humo/humo.obj");
 	Model escritorio((char*)"Models/mesanueva/model.obj");
@@ -496,6 +505,19 @@ int main()
 	Model servidor2((char*)"Models/Rack/rackNew.obj");
 	Model lampara((char*)"Models/lamp/lamp.obj");
 
+	Model TorsoCabezaM((char*)"Models/Persona/Torso-Cabeza.obj");
+	Model ManoIM((char*)"Models/Persona/Mano I.obj");
+	Model ManoDM((char*)"Models/Persona/Mano D.obj");
+	Model PiernaDM((char*)"Models/Persona/Pierna D.obj");
+	Model PiernaIM((char*)"Models/Persona/Pierna I.obj");
+	Model PieDM((char*)"Models/Persona/Pie D.obj");
+	Model PieIM((char*)"Models/Persona/Pie I.obj");
+	Model texto1((char*)"Models/texto1/model.obj");
+	Model texto2((char*)"Models/texto2/model.obj");
+	Model texto3((char*)"Models/texto3/model.obj");
+
+
+
 	////////////////////////// KEYFRAMES //////////////////////////////////
 
    /*Iniciarlizar todos los frames en 0 */
@@ -503,67 +525,30 @@ int main()
 	for (int i = 0; i < MAX_FRAMES; i++)
 	{
 
-		KeyFrame[i].dogPosX = 0;
-		KeyFrame[i].dogPosY = 0;
-		KeyFrame[i].dogPosZ = 0;
-		KeyFrame[i].incX = 0;
-		KeyFrame[i].incY = 0;
-		KeyFrame[i].incZ = 0;
-		KeyFrame[i].rotDog = 0;
-		KeyFrame[i].rotDogInc = 0;
-		KeyFrame[i].tail = 0;
-		KeyFrame[i].tailInc = 0;
-		KeyFrame[i].FLegs = 0;
-		KeyFrame[i].FLegsInc = 0;
-		KeyFrame[i].FLegsL = 0;
-		KeyFrame[i].FLegsLInc = 0;
-		KeyFrame[i].FLegsR = 0;
-		KeyFrame[i].FLegsRInc = 0;
-		KeyFrame[i].RLegs = 0;
-		KeyFrame[i].RLegsInc = 0;
-		KeyFrame[i].rotDogX = 0;
-		KeyFrame[i].rotDogXInc = 0;
-		KeyFrame[i].head = 0;
-		KeyFrame[i].headInc = 0;
+		KeyFrame[i].poshumanox = 0;
+		KeyFrame[i].poshumanoy = 122.055;
+		KeyFrame[i].poshumanoz = 0;
+		KeyFrame[i].poshumanoxInc = 0;
+		KeyFrame[i].poshumanoyInc = 0;
+		KeyFrame[i].poshumanozInc = 0;
+
+		KeyFrame[i].RodillasI = 0;
+		KeyFrame[i].RodillaD = 0;
+		KeyFrame[i].HombroI = 0;
+		KeyFrame[i].HombroD = 0;
+		KeyFrame[i].PiernaI = 0;
+		KeyFrame[i].PiernaD = 0;
+		KeyFrame[i].RotHuman = 0;
+
+		KeyFrame[i].RodillasIInc = 0;
+		KeyFrame[i].RodillaDInc = 0;
+		KeyFrame[i].HombroIInc = 0;
+		KeyFrame[i].HombroDInc = 0;
+		KeyFrame[i].PiernaIInc = 0;
+		KeyFrame[i].PiernaDInc = 0;
+		KeyFrame[i].RotHumanInc = 0;
+
 	}
-
-	//for (int i = 0; i < MAX_FRAMES_BOY; i++)
-	//{
-	//	//----------BOY------------
-
-	//	KeyFrameBoy[i].boyPosX = 0;
-	//	KeyFrameBoy[i].boyPosY = 0;
-	//	KeyFrameBoy[i].boyPosZ = 0;
-
-	//	KeyFrameBoy[i].sktPosX = 0;
-	//	KeyFrameBoy[i].sktPosY = 0;
-	//	KeyFrameBoy[i].sktPosZ = 0;
-
-	//	KeyFrameBoy[i].rotBoy = 0;
-	//	KeyFrameBoy[i].rotBoyInc = 0;
-	//	KeyFrameBoy[i].rotBoyX = 0;
-	//	KeyFrameBoy[i].rotBoyXInc = 0;
-
-	//	KeyFrameBoy[i].cuerpoBoy = 0;
-	//	KeyFrameBoy[i].cuerpoBoyInc = 0;
-	//	KeyFrameBoy[i].bicepDer = 0;
-	//	KeyFrameBoy[i].bicepDerInc = 0;
-	//	KeyFrameBoy[i].bicepIzq = 0;
-	//	KeyFrameBoy[i].bicepIzqInc = 0;
-	//	KeyFrameBoy[i].brazoDer = 0;
-	//	KeyFrameBoy[i].brazoDerInc = 0;
-	//	KeyFrameBoy[i].brazoIzq = 0;
-	//	KeyFrameBoy[i].brazoIzqInc = 0;
-	//	KeyFrameBoy[i].piernaDer = 0;
-	//	KeyFrameBoy[i].piernaDerInc = 0;
-	//	KeyFrameBoy[i].piernaIzq = 0;
-	//	KeyFrameBoy[i].piernaIzqInc = 0;
-	//	KeyFrameBoy[i].pantDer = 0;
-	//	KeyFrameBoy[i].pantDerInc = 0;
-	//	KeyFrameBoy[i].pantIzq = 0;
-	//	KeyFrameBoy[i].pantIzqInc = 0;
-
-	//}
 
 	//////////////////////////////////// FIN KEYFRAMES ///////////////////////////////
 	GLfloat skyboxScale = 0.0000000001f;
@@ -693,6 +678,7 @@ int main()
 		DoMovement();
 		Animation();
 
+
 		// Clear the colorbuffer
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -734,7 +720,7 @@ int main()
 
 
 		if (!nuevo) {
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].ambient"), 0.4f, 0.4f, 0.4f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].ambient"), 0.36f, 0.36f, 0.36f);
 			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].diffuse"), 0.4f, 0.4f, 0.4);
 			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].specular"), 0.01f, 0.01f, 0.01f);
 			glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].constant"), 1.0f);
@@ -743,7 +729,7 @@ int main()
 
 
 
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"), 0.4f, 0.4f, 0.4f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"), 0.36f, 0.36f, 0.36f);
 			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].diffuse"), 0.4f, 0.4f, 0.4f);
 			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].specular"), 0.0f, 0.0f, 0.0f);
 			glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].constant"), 1.0f);
@@ -752,7 +738,7 @@ int main()
 
 
 
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].ambient"), 0.4f, 0.4f, 0.4f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].ambient"), 0.36f, 0.36f, 0.36f);
 			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].diffuse"), 0.4f, 0.4f, 0.4f);
 			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].specular"), 0.0f, 0.0f, 0.0f);
 			glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].constant"), 1.0f);
@@ -778,12 +764,13 @@ int main()
 
 
 
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"), 0.0f, 0.0f, 0.0f);
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].diffuse"), 0.0f, 0.0f, 0.0f);
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].specular"), 0.0f, 0.0f, 0.0f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"), 0.36f, 0.36f, 0.36f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].diffuse"), 0.4f, 0.4f, 0.4);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].specular"), 0.01f, 0.01f, 0.01f);
 			glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].constant"), 1.0f);
-			glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].linear"), 0.1f);
-			glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].quadratic"), 0.7f);
+			glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].linear"), 0.045f);
+			glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].quadratic"), 0.075f);
+
 
 
 
@@ -858,26 +845,115 @@ int main()
 		glm::mat4 CU = glm::mat4(1);
 		glm::mat4 pizarron = glm::mat4(1);
 		glm::mat4 puerta = glm::mat4(1);
+		glm::mat4 escritorioP = glm::mat4(1);
 		glm::mat4 rack = glm::mat4(1.0f);
 		glm::mat4 rack2 = glm::mat4(1.0f);
 		glm::mat4 hum = glm::mat4(1);
+		//aqui
 
+		glm::mat4 humTorsoCabeza = glm::mat4(1.0f);
+		glm::mat4 humManoI = glm::mat4(1.0f);
+		glm::mat4 humManoD = glm::mat4(1.0f);
+		glm::mat4 humPiernaD = glm::mat4(1.0f);
+		glm::mat4 humPiernaI = glm::mat4(1.0f);
+		glm::mat4 humPieD = glm::mat4(1.0f);
+		glm::mat4 humPieI = glm::mat4(1.0f);
+		glm::mat4 PivTosrso = glm::mat4(1.0f);
 		glm::mat4 neon1 = glm::mat4(1);
+
+		glm::mat4 t1 = glm::mat4(1.0f);
+		glm::mat4 t2= glm::mat4(1.0f);
+		glm::mat4 t3 = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Salon.Draw(lightingShader);
-
+		/*prueba.Draw(lightingShader);*/
+		
 		puerta = model;
-		puerta = glm::translate(puerta, glm::vec3(0.001f, 0.001f, 0.0f));
+		puerta = glm::translate(puerta, glm::vec3(0.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(puerta));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(puerta));
 		Puer.Draw(lightingShader);
-		//frente
 
+		
+		
+		PivTosrso = model;
+
+		PivTosrso = glm::scale(PivTosrso, glm::vec3(0.00032f, 0.000315f, 0.00032f));
+		PivTosrso = glm::translate(PivTosrso, glm::vec3(-10.0f, 0.0f, -20.0f));
+
+		
+		// Torso + Cabeza
+		humTorsoCabeza = glm::translate(PivTosrso, glm::vec3(poshumanox, poshumanoy, poshumanoz));
+		humTorsoCabeza = glm::rotate(humTorsoCabeza, glm::radians(RotHuman), glm::vec3(0, 1, 0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(humTorsoCabeza));
+		TorsoCabezaM.Draw(lightingShader);
+
+		t1 = glm::translate(humTorsoCabeza, glm::vec3(63.665321f, 70.696693f, 0.0f));
+		t1 = glm::scale(t1, glm::vec3(tex1,tex1, tex1));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(t1));
+		texto1.Draw(lightingShader);
+
+		t2 = glm::translate(humTorsoCabeza, glm::vec3(63.665321f, 70.696693f, 0.0f));
+		t2 = glm::scale(t2, glm::vec3(tex2, tex2, tex2));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(t2));
+		texto2.Draw(lightingShader);
+		t3 = glm::translate(humTorsoCabeza, glm::vec3(63.665321f, 70.696693f, 0.0f));
+		t3 = glm::scale(t3, glm::vec3(tex3, tex3, tex3));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(t3));
+		texto3.Draw(lightingShader);
+
+		// Mano Izquierda
+		humManoI = glm::translate(humTorsoCabeza, glm::vec3(22.757f, 19.155f, 0.0f));
+		humManoI = glm::rotate(humManoI, glm::radians(HombroI), glm::vec3(1, 0, 0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(humManoI));
+		ManoIM.Draw(lightingShader);
+
+		// Mano Derecha
+		humManoD = glm::translate(humTorsoCabeza, glm::vec3(-22.757f, 19.155f, 0.0f));
+		humManoD = glm::rotate(humManoD, glm::radians(HombroD), glm::vec3(1, 0, 0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(humManoD));
+		ManoDM.Draw(lightingShader);
+
+		// Pierna Izquierda
+		humPiernaI = glm::translate(humTorsoCabeza, glm::vec3(7.864f, -31.574f, 0.0f));
+		humPiernaI = glm::rotate(humPiernaI, glm::radians(PiernaI), glm::vec3(1, 0, 0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(humPiernaI));
+		PiernaIM.Draw(lightingShader);
+
+		// Pierna Derecha
+		humPiernaD = glm::translate(humTorsoCabeza, glm::vec3(-9.66f, -31.574f, 1.337f));
+		humPiernaD = glm::rotate(humPiernaD, glm::radians(PiernaD), glm::vec3(1, 0, 0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(humPiernaD));
+		PiernaDM.Draw(lightingShader);
+
+		// Pie Izquierdo
+		humPieI = glm::translate(humPiernaI, glm::vec3(4.715f, -40.511f, 0.0f));
+		humPieI = glm::rotate(humPieI, glm::radians(RodillasI), glm::vec3(1, 0, 0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(humPieI));
+		PieIM.Draw(lightingShader);
+
+		// Pie Derecho
+		humPieD = glm::translate(humPiernaD, glm::vec3(-2.712f, -40.511f, -1.934f));
+		humPieD = glm::rotate(humPieD, glm::radians(RodillaD), glm::vec3(1, 0, 0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(humPieD));
+		PieDM.Draw(lightingShader);
+
+		
 		if (!nuevo) {
+			escritorioP = model;
+
+			escritorioP = glm::scale(escritorioP, glm::vec3(0.08f, 0.08f, 0.08f));
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(escritorioP));
+			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(escritorioP));
+			EscritorioP.Draw(lightingShader);
+			
+
 			humoPosX = 0;
 			humoPosY = 1.0 * 10 * 0.0012;
 			humoPosZ = 0;
@@ -1420,6 +1496,13 @@ int main()
 			glBindVertexArray(0);
 		}
 		else {
+			escritorioP = model;
+			escritorioP = glm::scale(escritorioP, glm::vec3(1.f, 1.0f, 1.0f));
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(escritorioP));
+			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(escritorioP));
+			EscritorioPnew.Draw(lightingShader);
+
 			neon1 = model;
 			// -1.449999, 5.760037, -2.889998
 			neon1 = glm::scale(neon1, glm::vec3(0.02f, 0.012f, 0.05f));
@@ -1915,6 +1998,11 @@ int main()
 
 
 	return 0;
+
+
+
+
+
 }
 
 // Moves/alters the camera positions based on user input
@@ -1949,6 +2037,8 @@ void DoMovement()
 
 	}
 
+
+
 	if (keys[GLFW_KEY_T])
 	{
 		mx += 0.01f;
@@ -1976,6 +2066,15 @@ void DoMovement()
 		mz += 0.01f;
 	}
 
+	
+	
+
+	if (keys[GLFW_KEY_O])
+	{
+		printf("%f,%f,%f \n", mx,my, mz);
+		
+	}
+
 	if (keys[GLFW_KEY_X])
 	{
 		monitores = 1;
@@ -1987,11 +2086,11 @@ void DoMovement()
 // Is called whenever a key is pressed/released via GLFW
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-	if (key == GLFW_KEY_L && GLFW_PRESS == action)
+	if (keys[GLFW_KEY_L])
 	{
 		if (play == false && (FrameIndex > 1))
 		{
-
+			PlaySound(TEXT("sonidos/caminata.wav"), NULL, SND_FILENAME | SND_ASYNC);
 			resetElements();
 			//First Interpolation				
 			interpolation();
@@ -2002,13 +2101,14 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 		}
 		else
 		{
+			
 			play = false;
 		}
 
 	}
 
 
-	if (key == GLFW_KEY_K && GLFW_PRESS == action)
+	if (keys[GLFW_KEY_K])
 	{
 		if (FrameIndex < MAX_FRAMES)
 		{
@@ -2018,7 +2118,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	}
 
 	if (key == GLFW_KEY_Q && GLFW_PRESS == action) {
-		SaveAnimation();  // Guarda la animaci�n en "Animacion.txt"
+		SaveAnimation ();  // Guarda la animaci�n en "Animacion.txt"
 	}
 
 	if (key == GLFW_KEY_R && GLFW_PRESS == action) {
@@ -2045,363 +2145,470 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 		}
 	}
 }
-
+void verdaderos() {
+	hablar = true;
+	musica1 = true;
+	muica2 = true;
+	musica3 = true;
+	musicafinal = true;
+	musicaCambio = true;
+}
 void Animation() {
-
+	
 	if (!nuevo) {
 		if (monitores) {
-
-			if (monitor1 > 0 && teclado1 > 0) {
-				monitor1 -= 0.01;
-				teclado1 -= 0.008;
-			}
-			else if (monitor2 > 0 && teclado2 > 0) {
-
-				monitor2 -= 0.01;
-				teclado2 -= 0.008;
-
-			}
-			else if (monitor3 > 0 && teclado3 > 0) {
-
-				monitor3 -= 0.01;
-				teclado3 -= 0.008;
-
-			}
-			else if (monitor4 > 0 && teclado4 > 0) {
-
-				monitor4 -= 0.01;
-				teclado4 -= 0.008;
-
-			}
-			else if (monitor5 > 0 && teclado5 > 0) {
-
-				monitor5 -= 0.01;
-				teclado5 -= 0.008;
-
-			}
-			else if (monitor6 > 0 && teclado6 > 0) {
-
-				monitor6 -= 0.01;
-				teclado6 -= 0.008;
-
-			}
-			else if (monitor7 > 0 && teclado7 > 0) {
-
-				monitor7 -= 0.01;
-				teclado7 -= 0.008;
-			}
-			else if (monitor8 > 0 && teclado8 > 0) {
-
-				monitor8 -= 0.01;
-				teclado8 -= 0.008;
-
-			}
-			else if (monitor9 > 0 && teclado9 > 0) {
-				monitor9 -= 0.01;
-				teclado9 -= 0.008;
-			}
-			else if (monitor10 > 0 && teclado10 > 0) {
-				monitor10 -= 0.01;
-				teclado10 -= 0.008;
-			}
-			else if (monitor11 > 0 && teclado11 > 0) {
-				monitor11 -= 0.01;
-				teclado11 -= 0.008;
-			}
-			else if (monitor12 > 0 && teclado12 > 0) {
-				monitor12 -= 0.01;
-				teclado12 -= 0.008;
-			}
-			else if (silla1 > 0) {
-				silla1 -= 0.01;
-			}
-			else if (silla222 > 0) {
-				silla222 -= 0.01;
-			}
-			else if (silla3 > 0) {
-				silla3 -= 0.01;
-			}
-			else if (silla4 > 0) {
-				silla4 -= 0.01;
-			}
-			else if (silla5 > 0) {
-				silla5 -= 0.01;
-			}
-			else if (silla6 > 0) {
-				silla6 -= 0.01;
-			}
-			else if (silla7 > 0) {
-				silla7 -= 0.01;
-			}
-			else if (silla8 > 0) {
-				silla8 -= 0.01;
-			}
-			else if (silla9 > 0) {
-				silla9 -= 0.01;
-			}
-			else if (silla10 > 0) {
-				silla10 -= 0.01;
-			}
-			else if (silla11 > 0) {
-				silla11 -= 0.01;
-			}
-			else if (silla12 > 0) {
-				silla12 -= 0.01;
-			}
-			else if (silla13 > 0) {
-				silla13 -= 0.01;
-			}
-			else if (silla14 > 0) {
-				silla14 -= 0.01;
-			}
-			else if (silla15 > 0) {
-				silla15 -= 0.01;
-			}
-			else if (silla16 > 0) {
-				silla16 -= 0.01;
-			}
-			else if (silla17 > 0) {
-				silla17 -= 0.01;
-			}
-			else if (silla18 > 0) {
-				silla18 -= 0.01;
-			}
-			else if (silla19 > 0) {
-				silla19 -= 0.01;
-			}
-			else if (silla20 > 0) {
-				silla20 -= 0.01;
-			}
-			else if (silla21 > 0) {
-				silla21 -= 0.01;
-			}
-			else if (silla22 > 0) {
-				silla22 -= 0.01;
-			}
-			else if (silla23 > 0) {
-				silla23 -= 0.01;
-			}
-			else if (silla24 > 0) {
-				silla24 -= 0.01;
-			}
-			else {
-				nuevo = 1;
+			if (musicaCambio) {
+				PlaySound(NULL, NULL, 0);
+				PlaySound(TEXT("sonidos/transformar.wav"), NULL, SND_FILENAME | SND_ASYNC);
+				musicaCambio = false;
 			}
 
+				if (monitor1 > 0  && teclado1 > 0) {
+					monitor1 -= 0.02;
+					teclado1 -= 0.02;
+				}
+				else if (monitor2 > 0 && teclado2 > 0) {
+
+					monitor2 -= 0.02;
+					teclado2 -= 0.02;
+
+				}
+				else if (monitor3 > 0 && teclado3 > 0) {
+
+					monitor3 -= 0.02;
+					teclado3 -= 0.02;
+
+				}
+				else if (monitor4 > 0 && teclado4 > 0) {
+
+					monitor4 -= 0.02;
+					teclado4 -= 0.02;
+
+				}
+				else if (monitor5 > 0 && teclado5 > 0) {
+
+					monitor5 -= 0.02;
+					teclado5 -= 0.02;
+
+				}
+				else if (monitor6 > 0 && teclado6 > 0) {
+
+					monitor6 -= 0.02;
+					teclado6 -= 0.02;
+
+				}
+				else if (monitor7 > 0 && teclado7 > 0) {
+
+					monitor7 -= 0.02;
+					teclado7 -= 0.02;
+				}
+				else if (monitor8 > 0 && teclado8 > 0) {
+
+					monitor8 -= 0.02;
+					teclado8 -= 0.02;
+
+				}
+				else if (monitor9 > 0 && teclado9 > 0) {
+					monitor9 -= 0.02;
+					teclado9 -= 0.02;
+				}
+				else if (monitor10 > 0 && teclado10 > 0) {
+					monitor10 -= 0.02;
+					teclado10 -= 0.02;
+				}
+				else if (monitor11 > 0 && teclado11 > 0) {
+					monitor11 -= 0.02;
+					teclado11 -= 0.02;
+				}
+				else if (monitor12 > 0 && teclado12 > 0) {
+					monitor12 -= 0.02;
+					teclado12 -= 0.02;
+				}
+				else if (silla1 > 0) {
+					silla1 -= 0.02;
+				}
+				else if (silla222 > 0) {
+					silla222 -= 0.02;
+				}
+				else if (silla3 > 0) {
+					silla3 -= 0.02;
+				}
+				else if (silla4 > 0) {
+					silla4 -= 0.02;
+				}
+				else if (silla5 > 0) {
+					silla5 -= 0.02;
+				}
+				else if (silla6 > 0) {
+					silla6 -= 0.02;
+				}
+				else if (silla7 > 0) {
+					silla7 -= 0.02;
+				}
+				else if (silla8 > 0) {
+					silla8 -= 0.02;
+				}
+				else if (silla9 > 0) {
+					silla9 -= 0.02;
+				}
+				else if (silla10 > 0) {
+					silla10 -= 0.02;
+				}
+				else if (silla11 > 0) {
+					silla11 -= 0.02;
+				}
+				else if (silla12 > 0) {
+					silla12 -= 0.02;
+				}
+				else if (silla13 > 0) {
+					silla13 -= 0.02;
+				}
+				else if (silla14 > 0) {
+					silla14 -= 0.02;
+				}
+				else if (silla15 > 0) {
+					silla15 -= 0.02;
+				}
+				else if (silla16 > 0) {
+					silla16 -= 0.02;
+				}
+				else if (silla17 > 0) {
+					silla17 -= 0.02;
+				}
+				else if (silla18 > 0) {
+					silla18 -= 0.02;
+				}
+				else if (silla19 > 0) {
+					silla19 -= 0.02;
+				}
+				else if (silla20 > 0) {
+					silla20 -= 0.02;
+				}
+				else if (silla21 > 0) {
+					silla21 -= 0.02;
+				}
+				else if (silla22 > 0) {
+					silla22 -= 0.02;
+				}
+				else if (silla23 > 0) {
+					silla23 -= 0.02;
+				}
+				else if (silla24 > 0) {
+					silla24 -= 0.02;
+				}
+				else {
+					nuevo = 1;
+				}
+
+			
 		}
 	}
 	else {
-		if (monitor1 < 1 && teclado1 < 1){
-			monitor1 += 0.01;
-			teclado1 += 0.008;
-		}
-		else if (monitor2 < 1 && teclado2 < 1) {
-			monitor2 += 0.01;
-			teclado2 += 0.008;
-		}
-		else if (monitor3 < 1 && teclado3 < 1) {
-			monitor3 += 0.01;
-			teclado3 += 0.008;
-		}
-		else if (monitor4 < 1 && teclado4 < 1) {
-			monitor4 += 0.01;
-			teclado4 += 0.008;
-		}
-		else if (monitor5 < 1 && teclado5 < 1) {
-			monitor5 += 0.01;
-			teclado5 += 0.008;
-		}
-		else if (monitor6 < 1 && teclado6 < 1) {
-			monitor6 += 0.01;
-			teclado6 += 0.008;
-		}
-		else if (monitor7 < 1 && teclado7 < 1) {
-			monitor7 += 0.01;
-			teclado7 += 0.008;
-		}
-		else if (monitor8 < 1 && teclado8 < 1) {
-			monitor8 += 0.01;
-			teclado8 += 0.008;
-		}
-		else if (monitor9 < 1 && teclado9 < 1) {
-			monitor9 += 0.01;
-			teclado9 += 0.008;
-		}
-		else if (monitor10 < 1 && teclado10 < 1) {
-			monitor10 += 0.01;
-			teclado10 += 0.008;
-		}
-		else if (monitor11 < 1 && teclado11 < 1) {
-			monitor11 += 0.01;
-			teclado11 += 0.008;
-		}
-		else if (monitor12 < 1 && teclado12 < 1) {
-			monitor12 += 0.01;
-			teclado12 += 0.008;
-		}
-		else if (silla1 < 1) {
-			silla1 += 0.01;
-		}
-		else if (silla222 < 1) {
-			silla222 += 0.01;
-		}
-		else if (silla3 < 1) {
-			silla3 += 0.01;
-		}
-		else if (silla4 < 1) {
-			silla4 += 0.01;
-		}
-		else if (silla5 < 1) {
-			silla5 += 0.01;
-		}
-		else if (silla6 < 1) {
-			silla6 += 0.01;
-		}
-		else if (silla7 < 1) {
-			silla7 += 0.01;
-		}
-		else if (silla8 < 1) {
-			silla8 += 0.01;
-		}
-		else if (silla9 < 1) {
-			silla9 += 0.01;
-		}
-		else if (silla10 < 1) {
-			silla10 += 0.01;
-		}
-		else if (silla11 < 1) {
-			silla11 += 0.01;
-		}
-		else if (silla12 < 1) {
-			silla12 += 0.01;
-		}
-		else if (silla13 < 1) {
-			silla13 += 0.01;
-		}
-		else if (silla14 < 1) {
-			silla14 += 0.01;
-		}
-		else if (silla15 < 1) {
-			silla15 += 0.01;
-		}
-		else if (silla16 < 1) {
-			silla16 += 0.01;
-		}
-		else if (silla17 < 1) {
-			silla17 += 0.01;
-		}
-		else if (silla18 < 1) {
-			silla18 += 0.01;
-		}
-		else if (silla19 < 1) {
-			silla19 += 0.01;
-		}
-		else if (silla20 < 1) {
-			silla20 += 0.01;
-		}
-		else if (silla21 < 1) {
-			silla21 += 0.01;
-		}
-		else if (silla22 < 1) {
-			silla22 += 0.01;
-		}
-		else if (silla23 < 1) {
-			silla23 += 0.01;
-		}
-		else if (silla24 < 1) {
-			silla24 += 0.01;
-		}
-		else {
-			monitores = 0;
-			humoflag = 0;
-			nuevo = 0;
-		}
-	}
-
-	if (humoflag) {
-
-		float rango = 40.0;
-		rhumo += 0.1;
-
-		if (contadorhumo1 >= rango) {
-			contadorhumo2 = 0.000001f;
-			contadorhumo1 = 0;
-
-			//printf("111111111111111111111111111111");
-		}
-		if (contadorhumo3 >= rango) {
-			contadorhumo4 = 0.000001f;
-			contadorhumo3 = 0;
-
-			//printf("2222222222222222222222222222");
-		}
-		if (contadorhumo5 >= rango) {
-			contadorhumo6 = 0.000001f;
-			contadorhumo5 = 0;
-
-			//printf("3333333333333333333333333333333");
-		}
-		if (contadorhumo7 >= rango) {
-			contadorhumo8 = 0.000001f;
-			contadorhumo7 = 0;
-
-			//printf("444444444444444444444444444444444");
-		}
-		if (contadorhumo9 >= rango) {
-			contadorhumo10 = 0.000001f;
-			contadorhumo9 = 0;
-		}
-		if (flagg) {
-			if (contadorhumo1 == 0) {
-				contadorhumo1 += 0.000001f;
-				H[0].position = glm::vec3(humoPosX, humoPosY, humoPosZ);
-				H[1].position = glm::vec3(humoPosX, humoPosY, humoPosZ);
-				H[2].position = glm::vec3(humoPosX, humoPosY, humoPosZ);
-				H[3].position = glm::vec3(humoPosX, humoPosY, humoPosZ);
-
-
-				H[0].size = glm::vec3(0.000001f, 0.000001f, 0.000001f);
-				H[1].size = glm::vec3(0.000001f, 0.000001f, 0.000001f);
-				H[2].size = glm::vec3(0.000001f, 0.000001f, 0.000001f);
-				H[3].size = glm::vec3(0.000001f, 0.000001f, 0.000001f);
+			if (monitor1 < 1 && teclado1 < 1) {
+				monitor1 += 0.02;
+				teclado1 += 0.02;
 			}
-			if (contadorhumo1 >= 0 && contadorhumo1 < (rango / 4)) {
-				contadorhumo2 += 0.000001f;
-				contadorhumo1 += 0.05f;
-
-				H[0].position = glm::vec3(humoPosX / contadorhumo2, contadorhumo1 + humoPosY / (contadorhumo2 * 2), humoPosZ / contadorhumo2);
-				H[0].size = glm::vec3(contadorhumo2, contadorhumo2 * 2, contadorhumo2);
-
-
-			}if (contadorhumo1 >= (rango / 4) && contadorhumo1 < (rango / 2)) {
-				contadorhumo2 += 0.000001f;
-				contadorhumo1 += 0.05f;
-				contadorhumo4 += 0.000001f;
-				contadorhumo3 += 0.05f;
-
-				H[0].position = glm::vec3(humoPosX / contadorhumo2, contadorhumo1 + humoPosY / (contadorhumo2 * 2), humoPosZ / contadorhumo2);
-				H[1].position = glm::vec3(humoPosX / contadorhumo4, contadorhumo3 + humoPosY / (contadorhumo4 * 2), humoPosZ / contadorhumo4);
-				H[0].size = glm::vec3(contadorhumo2, contadorhumo2 * 2, contadorhumo2);
-				H[1].size = glm::vec3(contadorhumo4, contadorhumo4 * 2, contadorhumo4);
+			else if (monitor2 < 1 && teclado2 < 1) {
+				monitor2 += 0.02;
+				teclado2 += 0.02;
+			}
+			else if (monitor3 < 1 && teclado3 < 1) {
+				monitor3 += 0.02;
+				teclado3 += 0.02;
+			}
+			else if (monitor4 < 1 && teclado4 < 1) {
+				monitor4 += 0.02;
+				teclado4 += 0.02;
+			}
+			else if (monitor5 < 1 && teclado5 < 1) {
+				monitor5 += 0.02;
+				teclado5 += 0.02;
+			}
+			else if (monitor6 < 1 && teclado6 < 1) {
+				monitor6 += 0.02;
+				teclado6 += 0.02;
+			}
+			else if (monitor7 < 1 && teclado7 < 1) {
+				monitor7 += 0.02;
+				teclado7 += 0.02;
+			}
+			else if (monitor8 < 1 && teclado8 < 1) {
+				monitor8 += 0.02;
+				teclado8 += 0.02;
+			}
+			else if (monitor9 < 1 && teclado9 < 1) {
+				monitor9 += 0.02;
+				teclado9 += 0.02;
+			}
+			else if (monitor10 < 1 && teclado10 < 1) {
+				monitor10 += 0.02;
+				teclado10 += 0.02;
+			}
+			else if (monitor11 < 1 && teclado11 < 1) {
+				monitor11 += 0.02;
+				teclado11 += 0.02;
+			}
+			else if (monitor12 < 1 && teclado12 < 1) {
+				monitor12 += 0.02;
+				teclado12 += 0.02;
+			}
+			else if (silla1 < 1) {
+				silla1 += 0.02;
+			}
+			else if (silla222 < 1) {
+				silla222 += 0.02;
+			}
+			else if (silla3 < 1) {
+				silla3 += 0.02;
+			}
+			else if (silla4 < 1) {
+				silla4 += 0.02;
+			}
+			else if (silla5 < 1) {
+				silla5 += 0.02;
+			}
+			else if (silla6 < 1) {
+				silla6 += 0.02;
+			}
+			else if (silla7 < 1) {
+				silla7 += 0.02;
+			}
+			else if (silla8 < 1) {
+				silla8 += 0.02;
+			}
+			else if (silla9 < 1) {
+				silla9 += 0.02;
+			}
+			else if (silla10 < 1) {
+				silla10 += 0.02;
+			}
+			else if (silla11 < 1) {
+				silla11 += 0.02;
+			}
+			else if (silla12 < 1) {
+				silla12 += 0.02;
+			}
+			else if (silla13 < 1) {
+				silla13 += 0.02;
+			}
+			else if (silla14 < 1) {
+				silla14 += 0.02;
+			}
+			else if (silla15 < 1) {
+				silla15 += 0.02;
+			}
+			else if (silla16 < 1) {
+				silla16 += 0.02;
+			}
+			else if (silla17 < 1) {
+				silla17 += 0.02;
+			}
+			else if (silla18 < 1) {
+				silla18 += 0.02;
+			}
+			else if (silla19 < 1) {
+				silla19 += 0.02;
+			}
+			else if (silla20 < 1) {
+				silla20 += 0.02;
+			}
+			else if (silla21 < 1) {
+				silla21 += 0.02;
+			}
+			else if (silla22 < 1) {
+				silla22 += 0.02;
+			}
+			else if (silla23 < 1) {
+				silla23 += 0.02;
+			}
+			else if (silla24 < 1) {
+				silla24 += 0.02;
+			}
+			else if (tiempoTexto < (contexto * 3)) {
+				tiempoTexto += 0.01;
+				tex3 = 1.0f;
+				tex1 = 0.0f;
+				tex2 = 0.0f;
+				if (musica3) {
+					PlaySound(NULL, NULL, 0);
+					PlaySound(TEXT("sonidos/hablar.wav"), NULL, SND_FILENAME | SND_ASYNC);
+					musica3 = false;
+				}
+			}
+			else if (HombroD <= 0.0f) {
+				HombroD += 0.3f;
+				HombroI += 0.3f;
+				tex3 = 0.0f;
+				if (musicafinal) {
+					PlaySound(NULL, NULL, 0);
+					PlaySound(TEXT("sonidos/final.wav"), NULL, SND_FILENAME | SND_ASYNC);
+					musicafinal = false;
+				}
 
 			}
-			if (contadorhumo1 >= (rango / 2) && contadorhumo1 < (rango * 3 / 4)) {
-				contadorhumo2 += 0.000001f;
-				contadorhumo1 += 0.05f;
-				contadorhumo4 += 0.000001f;
-				contadorhumo3 += 0.05f;
-				contadorhumo6 += 0.000001f;
-				contadorhumo5 += 0.05f;
-				H[0].position = glm::vec3(humoPosX / contadorhumo2, contadorhumo1 + humoPosY / (contadorhumo2 * 2), humoPosZ / contadorhumo2);
-				H[1].position = glm::vec3(humoPosX / contadorhumo4, contadorhumo3 + humoPosY / (contadorhumo4 * 2), humoPosZ / contadorhumo4);
-				H[2].position = glm::vec3(humoPosX / contadorhumo6, contadorhumo5 + humoPosY / (contadorhumo6 * 2), humoPosZ / contadorhumo6);
-				H[0].size = glm::vec3(contadorhumo2, contadorhumo2 * 2, contadorhumo2);
-				H[1].size = glm::vec3(contadorhumo4, contadorhumo4 * 2, contadorhumo4);
-				H[2].size = glm::vec3(contadorhumo6, contadorhumo6 * 2, contadorhumo6);
+		}
 
 
+
+
+
+		if (hablar) {
+
+			if (tiempoTexto < contexto) {
+				tiempoTexto += 0.01;
+				tex1 = 1.0f;
+				tex2 = 0.0f;
+				tex3 = 0.0f;
+				printf("%f\n", tiempoTexto);
+				if (musica1) {
+					PlaySound(TEXT("sonidos/hablar.wav"), NULL, SND_FILENAME | SND_ASYNC);
+					musica1 = false;
+				}
 			}
-			if (contadorhumo1 >= (rango * 3 / 4) && contadorhumo1 < rango) {
+			else if (tiempoTexto < (contexto * 2)) {
+				tiempoTexto += 0.01;
+				tex1 = 0.0f;
+				tex2 = 1.0f;
+				tex3 = 0.0f;
+				if (muica2) {
+					PlaySound(NULL, NULL, 0);
+					PlaySound(TEXT("sonidos/hablar.wav"), NULL, SND_FILENAME | SND_ASYNC);
+					muica2 = false;
+				}
+			}
+			else {
+				if (HombroD > -90.0f) {
+					HombroD -= 0.3f;
+					HombroI -= 0.3f;
+
+				}
+				else {
+					monitores = 1;
+					hablar = 0;
+				}
+			}
+
+
+
+
+
+		}
+
+
+		if (humoflag) {
+
+			float rango = 40.0;
+			rhumo += 0.1;
+
+			if (contadorhumo1 >= rango) {
+				contadorhumo2 = 0.000001f;
+				contadorhumo1 = 0;
+
+				//printf("111111111111111111111111111111");
+			}
+			if (contadorhumo3 >= rango) {
+				contadorhumo4 = 0.000001f;
+				contadorhumo3 = 0;
+
+				//printf("2222222222222222222222222222");
+			}
+			if (contadorhumo5 >= rango) {
+				contadorhumo6 = 0.000001f;
+				contadorhumo5 = 0;
+
+				//printf("3333333333333333333333333333333");
+			}
+			if (contadorhumo7 >= rango) {
+				contadorhumo8 = 0.000001f;
+				contadorhumo7 = 0;
+
+				//printf("444444444444444444444444444444444");
+			}
+			if (contadorhumo9 >= rango) {
+				contadorhumo10 = 0.000001f;
+				contadorhumo9 = 0;
+			}
+			if (flagg) {
+				if (contadorhumo1 == 0) {
+					contadorhumo1 += 0.000001f;
+					H[0].position = glm::vec3(humoPosX, humoPosY, humoPosZ);
+					H[1].position = glm::vec3(humoPosX, humoPosY, humoPosZ);
+					H[2].position = glm::vec3(humoPosX, humoPosY, humoPosZ);
+					H[3].position = glm::vec3(humoPosX, humoPosY, humoPosZ);
+
+
+					H[0].size = glm::vec3(0.000001f, 0.000001f, 0.000001f);
+					H[1].size = glm::vec3(0.000001f, 0.000001f, 0.000001f);
+					H[2].size = glm::vec3(0.000001f, 0.000001f, 0.000001f);
+					H[3].size = glm::vec3(0.000001f, 0.000001f, 0.000001f);
+				}
+				if (contadorhumo1 >= 0 && contadorhumo1 < (rango / 4)) {
+					contadorhumo2 += 0.000001f;
+					contadorhumo1 += 0.05f;
+
+					H[0].position = glm::vec3(humoPosX / contadorhumo2, contadorhumo1 + humoPosY / (contadorhumo2 * 2), humoPosZ / contadorhumo2);
+					H[0].size = glm::vec3(contadorhumo2, contadorhumo2 * 2, contadorhumo2);
+
+
+				}if (contadorhumo1 >= (rango / 4) && contadorhumo1 < (rango / 2)) {
+					contadorhumo2 += 0.000001f;
+					contadorhumo1 += 0.05f;
+					contadorhumo4 += 0.000001f;
+					contadorhumo3 += 0.05f;
+
+					H[0].position = glm::vec3(humoPosX / contadorhumo2, contadorhumo1 + humoPosY / (contadorhumo2 * 2), humoPosZ / contadorhumo2);
+					H[1].position = glm::vec3(humoPosX / contadorhumo4, contadorhumo3 + humoPosY / (contadorhumo4 * 2), humoPosZ / contadorhumo4);
+					H[0].size = glm::vec3(contadorhumo2, contadorhumo2 * 2, contadorhumo2);
+					H[1].size = glm::vec3(contadorhumo4, contadorhumo4 * 2, contadorhumo4);
+
+				}
+				if (contadorhumo1 >= (rango / 2) && contadorhumo1 < (rango * 3 / 4)) {
+					contadorhumo2 += 0.000001f;
+					contadorhumo1 += 0.05f;
+					contadorhumo4 += 0.000001f;
+					contadorhumo3 += 0.05f;
+					contadorhumo6 += 0.000001f;
+					contadorhumo5 += 0.05f;
+					H[0].position = glm::vec3(humoPosX / contadorhumo2, contadorhumo1 + humoPosY / (contadorhumo2 * 2), humoPosZ / contadorhumo2);
+					H[1].position = glm::vec3(humoPosX / contadorhumo4, contadorhumo3 + humoPosY / (contadorhumo4 * 2), humoPosZ / contadorhumo4);
+					H[2].position = glm::vec3(humoPosX / contadorhumo6, contadorhumo5 + humoPosY / (contadorhumo6 * 2), humoPosZ / contadorhumo6);
+					H[0].size = glm::vec3(contadorhumo2, contadorhumo2 * 2, contadorhumo2);
+					H[1].size = glm::vec3(contadorhumo4, contadorhumo4 * 2, contadorhumo4);
+					H[2].size = glm::vec3(contadorhumo6, contadorhumo6 * 2, contadorhumo6);
+
+
+				}
+				if (contadorhumo1 >= (rango * 3 / 4) && contadorhumo1 < rango) {
+					contadorhumo2 += 0.000001f;
+					contadorhumo1 += 0.05f;
+					contadorhumo4 += 0.000001f;
+					contadorhumo3 += 0.05f;
+					contadorhumo6 += 0.000001f;
+					contadorhumo5 += 0.05f;
+					contadorhumo8 += 0.000001f;
+					contadorhumo7 += 0.05f;
+					H[0].position = glm::vec3(humoPosX / contadorhumo2, contadorhumo1 + humoPosY / (contadorhumo2 * 2), humoPosZ / contadorhumo2);
+					H[1].position = glm::vec3(humoPosX / contadorhumo4, contadorhumo3 + humoPosY / (contadorhumo4 * 2), humoPosZ / contadorhumo4);
+					H[2].position = glm::vec3(humoPosX / contadorhumo6, contadorhumo5 + humoPosY / (contadorhumo6 * 2), humoPosZ / contadorhumo6);
+					H[3].position = glm::vec3(humoPosX / contadorhumo8, contadorhumo7 + humoPosY / (contadorhumo8 * 2), humoPosZ / contadorhumo8);
+					H[0].size = glm::vec3(contadorhumo2, contadorhumo2 * 2, contadorhumo2);
+					H[1].size = glm::vec3(contadorhumo4, contadorhumo4 * 2, contadorhumo4);
+					H[2].size = glm::vec3(contadorhumo6, contadorhumo6 * 2, contadorhumo6);
+					H[3].size = glm::vec3(contadorhumo8, contadorhumo8 * 2, contadorhumo8);
+
+
+
+				}
+
+				if (contadorhumo1 >= rango) {
+					flagg = 0;
+
+					/*H[4].size = glm::vec3(contadorhumo2, contadorhumo2 * 2, contadorhumo2);
+					H[4].position = glm::vec3(humoPosX, contadorhumo1 + humoPosY/contadorhumo2*2, humoPosZ);*/
+				}
+			}
+			else {
+
 				contadorhumo2 += 0.000001f;
 				contadorhumo1 += 0.05f;
 				contadorhumo4 += 0.000001f;
@@ -2418,82 +2625,59 @@ void Animation() {
 				H[1].size = glm::vec3(contadorhumo4, contadorhumo4 * 2, contadorhumo4);
 				H[2].size = glm::vec3(contadorhumo6, contadorhumo6 * 2, contadorhumo6);
 				H[3].size = glm::vec3(contadorhumo8, contadorhumo8 * 2, contadorhumo8);
-
-
-
-			}
-
-			if (contadorhumo1 >= rango) {
-				flagg = 0;
-
-				/*H[4].size = glm::vec3(contadorhumo2, contadorhumo2 * 2, contadorhumo2);
-				H[4].position = glm::vec3(humoPosX, contadorhumo1 + humoPosY/contadorhumo2*2, humoPosZ);*/
 			}
 		}
-		else {
-
-			contadorhumo2 += 0.000001f;
-			contadorhumo1 += 0.05f;
-			contadorhumo4 += 0.000001f;
-			contadorhumo3 += 0.05f;
-			contadorhumo6 += 0.000001f;
-			contadorhumo5 += 0.05f;
-			contadorhumo8 += 0.000001f;
-			contadorhumo7 += 0.05f;
-			H[0].position = glm::vec3(humoPosX / contadorhumo2, contadorhumo1 + humoPosY / (contadorhumo2 * 2), humoPosZ / contadorhumo2);
-			H[1].position = glm::vec3(humoPosX / contadorhumo4, contadorhumo3 + humoPosY / (contadorhumo4 * 2), humoPosZ / contadorhumo4);
-			H[2].position = glm::vec3(humoPosX / contadorhumo6, contadorhumo5 + humoPosY / (contadorhumo6 * 2), humoPosZ / contadorhumo6);
-			H[3].position = glm::vec3(humoPosX / contadorhumo8, contadorhumo7 + humoPosY / (contadorhumo8 * 2), humoPosZ / contadorhumo8);
-			H[0].size = glm::vec3(contadorhumo2, contadorhumo2 * 2, contadorhumo2);
-			H[1].size = glm::vec3(contadorhumo4, contadorhumo4 * 2, contadorhumo4);
-			H[2].size = glm::vec3(contadorhumo6, contadorhumo6 * 2, contadorhumo6);
-			H[3].size = glm::vec3(contadorhumo8, contadorhumo8 * 2, contadorhumo8);
-		}
-	}
 
 
-	if (play)
-	{
-		if (i_curr_steps >= i_max_steps) //end of animation between frames?
+		if (play)
 		{
-			playIndex++;
-			if (playIndex > FrameIndex - 2)	//end of total animation?
+			if (i_curr_steps >= i_max_steps) //end of animation between frames?
 			{
-				printf("termina anim\n");
-				playIndex = 0;
-				play = false;
+				playIndex++;
+				if (playIndex > FrameIndex - 2)	//end of total animation?
+				{
+
+					playIndex = 0;
+					play = false;
+					verdaderos();
+					printf("termina anim\n");
+					PlaySound(NULL, NULL, 0);
+
+				}
+				else //Next frame interpolations
+				{
+					i_curr_steps = 0; //Reset counter
+					//Interpolation
+					interpolation();
+				}
 			}
-			else //Next frame interpolations
+			else
 			{
-				i_curr_steps = 0; //Reset counter
-				//Interpolation
-				interpolation();
+				//Draw animation
+				poshumanox += KeyFrame[playIndex].poshumanoxInc;
+				poshumanoy += KeyFrame[playIndex].poshumanoyInc;
+				poshumanoz += KeyFrame[playIndex].poshumanozInc;
+
+				RodillasI += KeyFrame[playIndex].RodillasIInc;
+				RodillaD += KeyFrame[playIndex].RodillaDInc;
+				HombroI += KeyFrame[playIndex].HombroIInc;
+				HombroD += KeyFrame[playIndex].HombroDInc;
+				PiernaI += KeyFrame[playIndex].PiernaIInc;
+				PiernaD += KeyFrame[playIndex].PiernaDInc;
+
+				RotHuman += KeyFrame[playIndex].RotHumanInc;
+
+
+				i_curr_steps++;
+
 			}
-		}
-		else
-		{
-			//Draw animation
-			dogPosX += KeyFrame[playIndex].incX;
-			dogPosY += KeyFrame[playIndex].incY;
-			dogPosZ += KeyFrame[playIndex].incZ;
-			head += KeyFrame[playIndex].headInc;
-			tail += KeyFrame[playIndex].tailInc;
-			FLegsL += KeyFrame[playIndex].FLegsLInc;
-			FLegsR += KeyFrame[playIndex].FLegsRInc;
-			RLegs += KeyFrame[playIndex].RLegsInc;
-			FLegs += KeyFrame[playIndex].FLegsInc;
-			rotDog += KeyFrame[playIndex].rotDogInc;
-			rotDogX += KeyFrame[playIndex].rotDogXInc;
 
-			i_curr_steps++;
 		}
 
-	}
 
+	
 }
-
-void MouseCallback(GLFWwindow* window, double xPos, double yPos)
-{
+void MouseCallback(GLFWwindow* window, double xPos, double yPos){
 	if (firstMouse)
 	{
 		lastX = xPos;
