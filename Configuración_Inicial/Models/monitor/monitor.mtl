@@ -14,4 +14,4 @@ newmtl 10120_LCD_Computer_Monitor_v01_max2011_it2_10120_LCD_Computer_Monitor_v01
 	Ni 1.5000
 	Ke 0.0000 0.0000 0.0000
 	illum 2
-	map_Kd textures\10120_LCD_Computer_Monitor_v01_diffuse.jpg
+	map_Kd 10120_LCD_Computer_Monitor_v01_diffuse.jpg
