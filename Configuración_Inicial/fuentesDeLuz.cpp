@@ -429,6 +429,7 @@ int main()
 	for (int i = 0; i <= 4; i++) {
 		spawnParticle(i, humoPosX, humoPosY, humoPosZ, sizehumoy, sizehumoy, rotatehumo);
 	}
+
 	// Init GLFW
 	glfwInit();
 	// Set all the required options for GLFW
@@ -663,7 +664,9 @@ int main()
 	/////////////////////////////////////////////////////////
 
 	glm::mat4 projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
-
+	LoadAnimation(); //Carga la animaci�n por medio del archivo previamente guardado
+	PrintAnimation(); //Imprime en terminar los valores del archivo
+	resetElements(); // Resetear los elementos a los primeros keyframes cargados
 	// Game loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -720,8 +723,8 @@ int main()
 
 
 		if (!nuevo) {
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].ambient"), 0.36f, 0.36f, 0.36f);
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].diffuse"), 0.4f, 0.4f, 0.4);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].ambient"), 0.3f, 0.3f, 0.3f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].diffuse"), 0.3f, 0.3f, 0.3);
 			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].specular"), 0.01f, 0.01f, 0.01f);
 			glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].constant"), 1.0f);
 			glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].linear"), 0.045f);
@@ -729,8 +732,8 @@ int main()
 
 
 
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"), 0.36f, 0.36f, 0.36f);
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].diffuse"), 0.4f, 0.4f, 0.4f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"), 0.3f, 0.3f, 0.3f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].diffuse"), 0.3f, 0.3f, 0.3f);
 			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].specular"), 0.0f, 0.0f, 0.0f);
 			glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].constant"), 1.0f);
 			glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].linear"), 0.1f);
@@ -738,7 +741,7 @@ int main()
 
 
 
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].ambient"), 0.36f, 0.36f, 0.36f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].ambient"), 0.3f, 0.3f, 0.3f);
 			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].diffuse"), 0.4f, 0.4f, 0.4f);
 			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].specular"), 0.0f, 0.0f, 0.0f);
 			glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].constant"), 1.0f);
@@ -764,8 +767,8 @@ int main()
 
 
 
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"), 0.36f, 0.36f, 0.36f);
-			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].diffuse"), 0.4f, 0.4f, 0.4);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"), 0.3f, 0.3f, 0.3f);
+			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].diffuse"), 0.3f, 0.3f, 0.3);
 			glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].specular"), 0.01f, 0.01f, 0.01f);
 			glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].constant"), 1.0f);
 			glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].linear"), 0.045f);
@@ -879,7 +882,18 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(puerta));
 		Puer.Draw(lightingShader);
 
-		
+		// Activa la funcionalidad para trabajar con el canal alfa (transparencia)
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelVentana));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
+		modelVentana = glm::scale(modelVentana, glm::vec3(10.0f, 9.64f, 10.0f));
+		modelVentana = glm::translate(modelVentana, glm::vec3(0.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelVentana));
+		ventanas.Draw(lightingShader);
+		glDisable(GL_BLEND);
+		glBindVertexArray(0);
+
 		
 		PivTosrso = model;
 
@@ -1694,13 +1708,13 @@ int main()
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			silla2.Draw(lightingShader);
 
-			model2 = glm::translate(pivotesillas, glm::vec3(fSn1, 0.0f, -2.0f));
+			model2 = glm::translate(pivotesillas, glm::vec3(fSn1, 0.0f, -2.5f));
 			model2 = glm::scale(model2, glm::vec3(silla15, silla15, silla15));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			silla2.Draw(lightingShader);
 
-			model2 = glm::translate(pivotesillas, glm::vec3(fSn1, 0.0f, -1.5f));
+			model2 = glm::translate(pivotesillas, glm::vec3(fSn1, 0.0f, -1.3f));
 			model2 = glm::scale(model2, glm::vec3(silla16, silla16, silla16));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model2));
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
@@ -1966,18 +1980,7 @@ int main()
 
 		// Ventana transparente
 		lightingShader.Use();
-		glEnable(GL_BLEND); // Activa la funcionalidad para trabajar el canal alfa
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		// Aplicar esta matriz específica al shader
-		modelVentana = glm::translate(modelVentana, glm::vec3(0.0f, 0.0f, 0.0f));
-		modelVentana = glm::scale(modelVentana, glm::vec3(10.0f, 9.604f, 10.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelVentana));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
-		ventanas.Draw(lightingShader);
-
-		// Restaura configuración normal
-		glDisable(GL_BLEND);
 
 		// Swap the buffers
 		glDeleteVertexArrays(1, &VAO);
@@ -2075,14 +2078,21 @@ void DoMovement()
 		
 	}
 
-	if (keys[GLFW_KEY_X])
-	{
-		monitores = 1;
-		humoflag = 1;
-	}
+	
 
 }
+void falsos() {
+	hablar = false;
+	musica1 = false;
+	muica2 = false;
+	musica3 = false;
+	musicafinal = false;
+	musicaCambio = false;
+	monitores = false;
+	nuevo = 0;
+	tiempoTexto = 0;
 
+}
 // Is called whenever a key is pressed/released via GLFW
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
@@ -2090,6 +2100,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	{
 		if (play == false && (FrameIndex > 1))
 		{
+			
 			PlaySound(TEXT("sonidos/caminata.wav"), NULL, SND_FILENAME | SND_ASYNC);
 			resetElements();
 			//First Interpolation				
@@ -2122,10 +2133,11 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	}
 
 	if (key == GLFW_KEY_R && GLFW_PRESS == action) {
-
-		resetElements();  // Resetear los elementos a los primeros keyframes cargados
+		PlaySound(NULL, NULL, 0);
+		falsos();
 		LoadAnimation(); //Carga la animaci�n por medio del archivo previamente guardado
 		PrintAnimation(); //Imprime en terminar los valores del archivo
+		resetElements(); // Resetear los elementos a los primeros keyframes cargados
 	}
 
 	if (GLFW_KEY_ESCAPE == key && GLFW_PRESS == action)
@@ -2153,6 +2165,7 @@ void verdaderos() {
 	musicafinal = true;
 	musicaCambio = true;
 }
+
 void Animation() {
 	
 	if (!nuevo) {
@@ -2595,6 +2608,7 @@ void Animation() {
 					H[1].size = glm::vec3(contadorhumo4, contadorhumo4 * 2, contadorhumo4);
 					H[2].size = glm::vec3(contadorhumo6, contadorhumo6 * 2, contadorhumo6);
 					H[3].size = glm::vec3(contadorhumo8, contadorhumo8 * 2, contadorhumo8);
+
 
 
 

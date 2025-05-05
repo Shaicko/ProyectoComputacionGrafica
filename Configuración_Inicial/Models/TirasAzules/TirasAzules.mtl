@@ -12,5 +12,5 @@ newmtl Material__55
 	Kd 0.5880 0.5880 0.5880
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka NeonBlue.jpg
-	map_Kd NeonBlue.jpg
+	map_Ka DarkBlue.png
+	map_Kd DarkBlue.png
