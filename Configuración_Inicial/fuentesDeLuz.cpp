@@ -62,7 +62,6 @@ GLfloat lastFrame = 0.0f;  	// Time of last frame
 
 // Light attributes
 glm::vec3 lightPos(0.0f, 0.0f, 5.0f);
-bool active;
 int flag = 0;
 bool hablar = false, musica1 = false, muica2 = false, musica3 = false, musicafinal = false, musicaCambio = false;
 float tex1, tex2, tex3;
