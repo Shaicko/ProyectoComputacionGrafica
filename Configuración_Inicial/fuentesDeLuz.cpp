@@ -2007,7 +2007,7 @@ int main()
 			// Servidor
 			rack = model;
 			rack = glm::scale(rack, glm::vec3(1.0, 1.0f, 1.0f) * rackTam);
-			rack = glm::translate(rack, glm::vec3(rackx, 0.0f, rackz)/rackTam);
+			rack = glm::translate(rack, glm::vec3(rackx, 0.0f,0.136 +rackz)/rackTam);
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(rack));
 			servidor.Draw(lightingShader);
@@ -2017,7 +2017,7 @@ int main()
 			// El servidor y otros objetos que se mantienen igual
 			rack2 = model;
 			rack2 = glm::scale(rack2, glm::vec3(1.0, 1.0f, 1.0f)*rackTam);
-			rack2 = glm::translate(rack2, glm::vec3(0.0f, 0.0f, rackz)/rackTam);
+			rack2 = glm::translate(rack2, glm::vec3(rackx, 0.0f, rackz)/rackTam);
 				glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(rack2));
 			servidor2.Draw(lightingShader);
@@ -3097,17 +3097,17 @@ else if (tamppizpa >0) {
 			if (rack11) {
 
 
-				if (rackz > -0.230) {
+				if (rackz > -0.232) {
 					rackz -= 0.0005;
 					if (RotHuman > -45) {
-						RotHuman -= 0.2;
+						RotHuman -= 0.15;
 						if (RodillaD < 45) {
 							PiernaD -= 0.4;
 							RodillaD += 0.4;
 						}
 					}
 					else if (RotHuman > -90) {
-						RotHuman -= 0.2;
+						RotHuman -= 0.15;
 						if (RodillaD > 0) {
 							PiernaD += 0.4;
 							RodillaD -= 0.4;
@@ -3115,17 +3115,17 @@ else if (tamppizpa >0) {
 
 					}
 				}
-				else if (rackx > -0.075) {
+				else if (rackx > -0.090) {
 					rackx -= 0.001;
 
 				}
-				else if (rackTam > 0.5) {
+				else if (rackTam > 0.7) {
 					rackTam -= 0.001;
 				}
-				else if (rackz > -0.371) {
-					rackz -= 0.0025;
+				else if (rackz > -0.320) {
+					rackz -= 0.0003;
 					if (RotHuman > -135) {
-						RotHuman -= 0.3;
+						RotHuman -= 0.1;
 					}
 				}
 				else {
@@ -3135,8 +3135,8 @@ else if (tamppizpa >0) {
 			}
 			else {
 
-				if (rackz < 0) {
-					rackz += 0.001;
+				if (rackz < -0.0700) {
+					rackz += 0.0005;
 					if(RotHuman < -90) {
 						RotHuman += 0.05;
 
@@ -3145,6 +3145,7 @@ else if (tamppizpa >0) {
 				}
 				else if (rackTam<1) {
 					rackTam += 0.001;
+					RotHuman = -90;
 				}
 				else if (purtaRot < 0) {
 					purtaRot += 1;
