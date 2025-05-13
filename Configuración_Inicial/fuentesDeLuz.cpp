@@ -152,9 +152,16 @@ float head = 0.0f;
 float tail = 0.0f;
 
 
+float vuelta1 = 0;
+float vuelta2 = 0;
 
+int pizzarron3 = 1;
 
-
+int rackflag = 0;
+int rack11 = 1;
+float rackx=0.0f;
+float rackz =0.0f;
+float rackTam =1.0;
 float radio = 0.0f;  // Radio del c�rculo
 float angle = 0.0f;  // �ngulo inicial
 bool moveRot = false;
@@ -229,7 +236,54 @@ float teclado10 = 1.0f;
 float teclado11 = 1.0f;
 float teclado12 = 1.0f;
 
+float columna1 = -14.5f * 10;
+float columna2 = -13.0f * 10;
+float columna3 = 11.0f * 10;
+float columna4 = 12.5f * 10;
 
+
+float fila1 = 12.0f * 10;
+float fila2 = -14.0f * 10;
+float fila3 = -1.0f * 10;
+
+float cpx1 = columna1;
+float cpx2 = columna1;
+float cpx3 = columna1;
+float cpx4 = columna2;
+float cpx5 = columna2;
+float cpx6 = columna2;
+float cpx7 = columna3;
+float cpx8 = columna3;
+float cpx9 = columna3;
+float cpx10 = columna4;
+float cpx11 = columna4;
+float cpx12 = columna4;
+
+float cpz1 = fila1;
+float cpz2 = fila2;
+float cpz3 = fila3;
+float cpz4 = fila1;
+float cpz5 = fila2;
+float cpz6 = fila3;
+float cpz7 = fila1;
+float cpz8 = fila2;
+float cpz9 = fila3;
+float cpz10 = fila1;
+float cpz11 = fila2;
+float cpz12 = fila3;
+
+
+float purtaRot = 0.0;
+
+float tamppizpa = 1.0;
+
+int pizzarronFlag = 0;
+float tampiz = 1.0;
+float brazorot = 0.0;
+
+
+
+float pizzarron = 1.0;
 //Modificar estos KeyFrames pues es para cada animaci�n
 
 float poshumanox = 0.0f;
@@ -875,7 +929,8 @@ int main()
 		/*prueba.Draw(lightingShader);*/
 		
 		puerta = model;
-		puerta = glm::translate(puerta, glm::vec3(0.0f, 0.0f, 0.0f));
+		puerta = glm::translate(puerta, glm::vec3(-0.115f, 0.034f, -0.148f));
+		puerta = glm::rotate(puerta, glm::radians(purtaRot), glm::vec3(0, 1, 0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(puerta));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(puerta));
@@ -922,13 +977,13 @@ int main()
 
 		// Mano Izquierda
 		humManoI = glm::translate(humTorsoCabeza, glm::vec3(22.757f, 19.155f, 0.0f));
-		humManoI = glm::rotate(humManoI, glm::radians(HombroI), glm::vec3(1, 0, 0));
+		humManoI = glm::rotate(humManoI, glm::radians(HombroI), glm::vec3(1, 0, -brazorot));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(humManoI));
 		ManoIM.Draw(lightingShader);
 
 		// Mano Derecha
 		humManoD = glm::translate(humTorsoCabeza, glm::vec3(-22.757f, 19.155f, 0.0f));
-		humManoD = glm::rotate(humManoD, glm::radians(HombroD), glm::vec3(1, 0, 0));
+		humManoD = glm::rotate(humManoD, glm::radians(HombroD), glm::vec3(1, 0, brazorot));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(humManoD));
 		ManoDM.Draw(lightingShader);
 
@@ -960,7 +1015,7 @@ int main()
 		if (!nuevo) {
 			escritorioP = model;
 
-			escritorioP = glm::scale(escritorioP, glm::vec3(0.08f, 0.08f, 0.08f));
+			escritorioP = glm::scale(escritorioP, glm::vec3(0.08f, 0.08f * tamppizpa, 0.08f));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(escritorioP));
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(escritorioP));
@@ -985,17 +1040,10 @@ int main()
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(lamp));
 			lampara.Draw(lightingShader);
 
-			pizarron = model;
-			pizarron = glm::scale(pizarron, glm::vec3(0.007f, 0.007f, 0.007f));
-			pizarron = glm::rotate(pizarron, glm::radians(180.0f), glm::vec3(.00f, -1.0f, 0.0f));
-			pizarron = glm::translate(pizarron, glm::vec3(0.0f, 6.0f, 20.0f));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
-			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
-			pizarra.Draw(lightingShader);
+			
 
 			modelTemp = model;
-			modelTemp = glm::scale(modelTemp, glm::vec3(0.0015f, 0.0015f, 0.0015f));
+			modelTemp = glm::scale(modelTemp, glm::vec3(0.0015f, 0.0015f * tamppizpa, 0.0015f));
 			modelTemp = glm::translate(modelTemp, glm::vec3(40.0f, 0.0f, -0.0f));
 
 			// Mesas - mantener igual
@@ -1389,27 +1437,26 @@ int main()
 			teclado.Draw(lightingShader);
 
 			// CPUs - mantener igual
-			// CPUs de mesa de adelante
-			CU = glm::translate(CPUpiv, glm::vec3(-14.5f * 10, 0.0f, -14.0f * 10));
+			CU = glm::translate(CPUpiv, glm::vec3(cpx1, 0.0f,cpz1));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			cpu.Draw(lightingShader);
 
-			CU = glm::translate(CPUpiv, glm::vec3(-13.0f * 10, 0.0f, -14.0f * 10));
+			CU = glm::translate(CPUpiv, glm::vec3(cpx2, 0.0f, cpz2));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			cpu.Draw(lightingShader);
 
-			// CPUs MEDIO IZQ
-			CU = glm::translate(CPUpiv, glm::vec3(-14.5f * 10, 0.0f, -1.0f * 10));
+
+			CU = glm::translate(CPUpiv, glm::vec3(cpx3, 0.0f, cpz3));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			cpu.Draw(lightingShader);
 
-			CU = glm::translate(CPUpiv, glm::vec3(-13.0f * 10, 0.0f, -1.0f * 10));
+			CU = glm::translate(CPUpiv, glm::vec3(cpx4, 0.0f, cpz4));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
@@ -1433,26 +1480,26 @@ int main()
 			}
 
 			// CPUs atras izq
-			CU = glm::translate(CPUpiv, glm::vec3(-14.5f * 10, 0.0f, 12.0f * 10));
+			CU = glm::translate(CPUpiv, glm::vec3(cpx5, 0.0f, cpz5));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			cpu.Draw(lightingShader);
 
-			CU = glm::translate(CPUpiv, glm::vec3(-13.0f * 10, 0.0f, 12.0f * 10));
+			CU = glm::translate(CPUpiv, glm::vec3(cpx6, 0.0f, cpz6));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			cpu.Draw(lightingShader);
 
 			// CPUs de mesa de adelante (derecha)
-			CU = glm::translate(CPUpiv, glm::vec3(11.0f * 10, 0.0f, -14.0f * 10));
+			CU = glm::translate(CPUpiv, glm::vec3(cpx7, 0.0f, cpz7));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			cpu.Draw(lightingShader);
 
-			CU = glm::translate(CPUpiv, glm::vec3(9.5f * 10, 0.0f, -14.0f * 10));
+			CU = glm::translate(CPUpiv, glm::vec3(cpx8, 0.0f, cpz8));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
@@ -1476,41 +1523,35 @@ int main()
 			}
 
 			// CPUs MEDIO DER
-			CU = glm::translate(CPUpiv, glm::vec3(11.0f * 10, 0.0f, -1.0f * 10));
+			CU = glm::translate(CPUpiv, glm::vec3(cpx9, 0.0f, cpz9));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			cpu.Draw(lightingShader);
 
-			CU = glm::translate(CPUpiv, glm::vec3(9.5f * 10, 0.0f, -1.0f * 10));
+			CU = glm::translate(CPUpiv, glm::vec3(cpx10, 0.0f, cpz10));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			cpu.Draw(lightingShader);
 
 			// CPUs atras der
-			CU = glm::translate(CPUpiv, glm::vec3(11.0f * 10, 0.0f, 12.0f * 10));
+			CU = glm::translate(CPUpiv, glm::vec3(cpx11, 0.0f, cpz11));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			cpu.Draw(lightingShader);
 
-			CU = glm::translate(CPUpiv, glm::vec3(9.5f * 10, 0.0f, 12.0f * 10));
+			CU = glm::translate(CPUpiv, glm::vec3(cpx12, 0.0f, cpz12));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(CU));
 			cpu.Draw(lightingShader);
 
-			// Servidor
-			rack = model;
-			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(rack));
-			servidor.Draw(lightingShader);
-			glBindVertexArray(0);
 		}
 		else {
 			escritorioP = model;
-			escritorioP = glm::scale(escritorioP, glm::vec3(1.f, 1.0f, 1.0f));
+			escritorioP = glm::scale(escritorioP, glm::vec3(1.f, 1.0f * tamppizpa, 1.0f));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(escritorioP));
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(escritorioP));
@@ -1535,17 +1576,10 @@ int main()
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(neon1));
 			neon.Draw(lightingShader);
 
-			pizarron = model;
-			pizarron = glm::scale(pizarron, glm::vec3(0.012f, 0.012f, 0.012f));
-			pizarron = glm::rotate(pizarron, glm::radians(0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-			pizarron = glm::translate(pizarron, glm::vec3(6.5f, 1.0f, -12.5f));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
-			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
-			tele.Draw(lightingShader);
+			
 
 			modelTemp = model;
-			modelTemp = glm::scale(modelTemp, glm::vec3(0.08f, 0.08f, 0.08f));
+			modelTemp = glm::scale(modelTemp, glm::vec3(0.08f, 0.08f * tamppizpa, 0.08f));
 			modelTemp = glm::translate(modelTemp, glm::vec3(0.0f, 0.13f, 0.0f));
 			//modelTemp= glm::rotate(modelTemp, glm::radians(90.0f), glm::vec3(-1.0f, -1.0f, 0.0f));
 
@@ -1942,13 +1976,55 @@ int main()
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecla));
 			tecladoled.Draw(lightingShader);
 
+			
+		}
+
+		if (pizzarron3) {
+
+			pizarron = model;
+			pizarron = glm::scale(pizarron, glm::vec3(0.007f, 0.007f , 0.007f) * tampiz);
+			pizarron = glm::rotate(pizarron, glm::radians(180.0f), glm::vec3(.00f, -1.0f, 0.0f));
+			pizarron = glm::translate(pizarron, glm::vec3(0.0f, 6.0f, 20.0f) / tampiz);
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
+			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
+			pizarra.Draw(lightingShader);
+		}
+		else {
+			pizarron = model;
+			pizarron = glm::scale(pizarron, glm::vec3(0.012f, 0.012f, 0.012f) * tampiz);
+			pizarron = glm::rotate(pizarron, glm::radians(0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+			pizarron = glm::translate(pizarron, glm::vec3(6.5f, 1.0f, -12.5f) / tampiz);
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
+			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
+			tele.Draw(lightingShader);
+		}
+
+		if (rack11) {
+			
+			// Servidor
+			rack = model;
+			rack = glm::scale(rack, glm::vec3(1.0, 1.0f, 1.0f) * rackTam);
+			rack = glm::translate(rack, glm::vec3(rackx, 0.0f,0.136 +rackz)/rackTam);
+			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(rack));
+			servidor.Draw(lightingShader);
+
+		}
+		else {
 			// El servidor y otros objetos que se mantienen igual
 			rack2 = model;
-			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+			rack2 = glm::scale(rack2, glm::vec3(1.0, 1.0f, 1.0f)*rackTam);
+			rack2 = glm::translate(rack2, glm::vec3(rackx, 0.0f, rackz)/rackTam);
+				glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(rack2));
 			servidor2.Draw(lightingShader);
-			glBindVertexArray(0);
+			
+
 		}
+
+		glBindVertexArray(0);
 
 		/* Also draw the lamp object, again binding the appropriate shader*/
 		lampShader.Use();
@@ -2090,6 +2166,40 @@ void falsos() {
 	monitores = false;
 	nuevo = 0;
 	tiempoTexto = 0;
+	 cpx1 = columna1;
+	 cpx2 = columna1;
+	 cpx3 = columna1;
+	 cpx4 = columna2;
+	 cpx5 = columna2;
+	 cpx6 = columna2;
+	 cpx7 = columna3;
+	 cpx8 = columna3;
+	 cpx9 = columna3;
+	 cpx10 = columna4;
+	 cpx11 = columna4;
+	 cpx12 = columna4;
+
+	 cpz1 = fila1;
+	 cpz2 = fila2;
+	 cpz3 = fila3;
+	 cpz4 = fila1;
+	 cpz5 = fila2;
+	cpz6 = fila3;
+	 cpz7 = fila1;
+	 cpz8 = fila2;
+	 cpz9 = fila3;
+	 cpz10 = fila1;
+	 cpz11 = fila2;
+	cpz12 = fila3;
+	pizzarronFlag = 0.0f;
+	purtaRot = 0.0;
+	vuelta1 = 0;
+	vuelta2 = 0;
+	pizzarron3 = 1;
+	rack11 = 1;
+	rackflag = 0;
+	rackx = 0;
+	rackz = 0;
 
 }
 // Is called whenever a key is pressed/released via GLFW
@@ -2307,16 +2417,557 @@ void Animation() {
 				}
 				else if (silla24 > 0) {
 					silla24 -= 0.02;
+					}
+				else if (purtaRot > -90) {
+						purtaRot -=1;
 				}
+				else if (cpx1 > -200.0) {
+					cpx1 -= 3;
+					if (RotHuman > -45) {
+						RotHuman -= 2;
+						if (RodillaD < 45) {
+							PiernaD -= 2;
+							RodillaD += 2;
+						}
+					}
+				}
+				else if (cpz1 > -500.0) {
+					if (cpz1 > -490) {
+						cpz1 -= 5;
+						if (RotHuman > -90) {
+						RotHuman -= 2;
+						if (RodillaD > 0) {
+							PiernaD += 2;
+							RodillaD -= 2;
+						}
+					}
+					}
+					else if (RotHuman < -45) {
+						RotHuman += 2;
+						if (RodillaD < 45) {
+							PiernaD -= 2;
+							RodillaD += 2;
+						}
+					}
+					else if (RotHuman < 0) {
+						RotHuman += 2;
+						if (RodillaD > 0) {
+							PiernaD += 2;
+							RodillaD -= 2;
+						}
+					}
+					else if (RodillaD > 0) {
+						PiernaD += 2;
+						RodillaD -= 2;
+					}
+					else {
+						cpz1 -= 5;
+					}
+				}
+				
+				else if (cpx2 > -200.0) {
+					cpx2 -= 3;
+					if (RotHuman > -45) {
+						RotHuman -= 2;
+						if (RodillaD < 45) {
+							PiernaD -= 2;
+							RodillaD += 2;
+						}
+					}
+				}
+				else if (cpz2 > -500.0) {
+					if (cpz2 > -490) {
+						cpz2 -= 5;
+						if (RotHuman > -90) {
+							RotHuman -= 2;
+							if (RodillaD > 0) {
+								PiernaD += 2;
+								RodillaD -= 2;
+							}
+						}
+					}
+					else if (RotHuman < -45) {
+						RotHuman += 2;
+						if (RodillaD < 45) {
+							PiernaD -= 2;
+							RodillaD += 2;
+						}
+					}
+					else if (RotHuman < 0) {
+						RotHuman += 2;
+						if (RodillaD > 0) {
+							PiernaD += 2;
+							RodillaD -= 2;
+						}
+					}
+					else if (RodillaD > 0) {
+						PiernaD += 2;
+						RodillaD -= 2;
+					}
+					else {
+						cpz2 -= 5;
+					}
+				}
+				else if (cpx3 > -200.0) {
+					cpx3 -= 3;
+					if (RotHuman > -45) {
+						RotHuman -= 2;
+						if (RodillaD < 45) {
+							PiernaD -= 2;
+							RodillaD += 2;
+						}
+					}
+				}
+				else if (cpz3 > -500.0) {
+					if (cpz3 > -490) {
+						cpz3 -= 5;
+						if (RotHuman > -90) {
+							RotHuman -= 2;
+							if (RodillaD > 0) {
+								PiernaD += 2;
+								RodillaD -= 2;
+							}
+						}
+					}
+					else if (RotHuman < -45) {
+						RotHuman += 2;
+						if (RodillaD < 45) {
+							PiernaD -= 2;
+							RodillaD += 2;
+						}
+					}
+					else if (RotHuman < 0) {
+						RotHuman += 2;
+						if (RodillaD > 0) {
+							PiernaD += 2;
+							RodillaD -= 2;
+						}
+					}
+					else if (RodillaD > 0) {
+						PiernaD += 2;
+						RodillaD -= 2;
+					}
+					else {
+						cpz3 -= 5;
+					}
+				}
+				
+				else if (cpx4 > -200.0) {
+					cpx4 -= 3;
+					if (RotHuman > -45) {
+						RotHuman -= 2;
+						if (RodillaD < 45) {
+							PiernaD -= 2;
+							RodillaD += 2;
+						}
+					}
+				}
+				else if (cpz4 > -500.0) {
+					if (cpz4 > -490) {
+						cpz4 -= 5;
+						if (RotHuman > -90) {
+							RotHuman -= 2;
+							if (RodillaD > 0) {
+								PiernaD += 2;
+								RodillaD -= 2;
+							}
+						}
+					}
+					else if (RotHuman < -45) {
+						RotHuman += 2;
+						if (RodillaD < 45) {
+							PiernaD -= 2;
+							RodillaD += 2;
+						}
+					}
+					else if (RotHuman < 0) {
+						RotHuman += 2;
+						if (RodillaD > 0) {
+							PiernaD += 2;
+							RodillaD -= 2;
+						}
+					}
+					else if (RodillaD > 0) {
+						PiernaD += 2;
+						RodillaD -= 2;
+					}
+					else {
+						cpz4 -= 5;
+					}
+				}
+				
+				else if (cpx5 > -200.0) {
+					cpx5 -= 3;
+					if (RotHuman > -45) {
+						RotHuman -= 2;
+						if (RodillaD < 45) {
+							PiernaD -= 2;
+							RodillaD += 2;
+						}
+					}
+				}
+				else if (cpz5 > -500.0) {
+					if (cpz5 > -490) {
+						cpz5 -= 5;
+						if (RotHuman > -90) {
+							RotHuman -= 2;
+							if (RodillaD > 0) {
+								PiernaD += 2;
+								RodillaD -= 2;
+							}
+						}
+					}
+					else if (RotHuman < -45) {
+						RotHuman += 2;
+						if (RodillaD < 45) {
+							PiernaD -= 2;
+							RodillaD += 2;
+						}
+					}
+					else if (RotHuman < 0) {
+						RotHuman += 2;
+						if (RodillaD > 0) {
+							PiernaD += 2;
+							RodillaD -= 2;
+						}
+					}
+					else if (RodillaD > 0) {
+						PiernaD += 2;
+						RodillaD -= 2;
+					}
+					else {
+						cpz5 -= 5;
+					}
+				}
+				
+				else if (cpx6 > -200.0) {
+    cpx6 -= 3;
+    if (RotHuman > -45) {
+        RotHuman -= 2;
+        if (RodillaD < 45) {
+            PiernaD -= 2;
+            RodillaD += 2;
+        }
+    }
+} 
+				else if (cpz6 > -500.0) {
+					if (cpz6 > -490) {
+						cpz6 -= 5;
+						if (RotHuman > -90) {
+							RotHuman -= 2;
+							if (RodillaD > 0) {
+								PiernaD += 2;
+								RodillaD -= 2;
+							}
+						}
+					}
+					else if (RotHuman < -45) {
+						RotHuman += 2;
+						if (RodillaD < 45) {
+							PiernaD -= 2;
+							RodillaD += 2;
+						}
+					}
+					else if (RotHuman < 0) {
+						RotHuman += 2;
+						if (RodillaD > 0) {
+							PiernaD += 2;
+							RodillaD -= 2;
+						}
+					}
+					else if (RodillaD > 0) {
+						PiernaD += 2;
+						RodillaD -= 2;
+					}
+					else {
+						cpz6 -= 5;
+					}
+}
+else if (cpx7 > -200.0) {
+    cpx7 -= 3;
+    if (RotHuman > -45) {
+        RotHuman -= 1;
+        if (RodillaD < 45) {
+            PiernaD -= 1;
+            RodillaD += 1;
+        }
+    }
+}
+else if (cpz7 > -500.0) {
+	if (cpz7 > -490) {
+		cpz7 -= 5;
+		if (RotHuman > -90) {
+			RotHuman -= 2;
+			if (RodillaD > 0) {
+				PiernaD += 2;
+				RodillaD -= 2;
+			}
+		}
+	}
+	else if (RotHuman < -45) {
+		RotHuman += 2;
+		if (RodillaD < 45) {
+			PiernaD -= 2;
+			RodillaD += 2;
+		}
+	}
+	else if (RotHuman < 0) {
+		RotHuman += 2;
+		if (RodillaD > 0) {
+			PiernaD += 2;
+			RodillaD -= 2;
+		}
+	}
+	else if (RodillaD > 0) {
+		PiernaD += 2;
+		RodillaD -= 2;
+	}
+	else {
+		cpz7 -= 5;
+	}
+}
+
+else if (cpx8 > -200.0) {
+    cpx8 -= 3;
+    if (RotHuman > -45) {
+        RotHuman -= 1;
+        if (RodillaD < 45) {
+            PiernaD -= 1;
+            RodillaD += 1;
+        }
+    }
+} 
+else if (cpz8 > -500.0) {
+	if (cpz8 > -490) {
+		cpz8 -= 5;
+		if (RotHuman > -90) {
+			RotHuman -= 2;
+			if (RodillaD > 0) {
+				PiernaD += 2;
+				RodillaD -= 2;
+			}
+		}
+	}
+	else if (RotHuman < -45) {
+		RotHuman += 2;
+		if (RodillaD < 45) {
+			PiernaD -= 2;
+			RodillaD += 2;
+		}
+	}
+	else if (RotHuman < 0) {
+		RotHuman += 2;
+		if (RodillaD > 0) {
+			PiernaD += 2;
+			RodillaD -= 2;
+		}
+	}
+	else if (RodillaD > 0) {
+		PiernaD += 2;
+		RodillaD -= 2;
+	}
+	else {
+		cpz8 -= 5;
+	}
+}
+
+
+else if (cpx9 > -200.0) {
+    cpx9 -= 3;
+    if (RotHuman > -45) {
+        RotHuman -= 1;
+        if (RodillaD < 45) {
+            PiernaD -= 1;
+            RodillaD += 1;
+        }
+    }
+}
+else if (cpz9 > -500.0) {
+	if (cpz9 > -490) {
+		cpz9 -= 5;
+		if (RotHuman > -90) {
+			RotHuman -= 2;
+			if (RodillaD > 0) {
+				PiernaD += 2;
+				RodillaD -= 2;
+			}
+		}
+	}
+	else if (RotHuman < -45) {
+		RotHuman += 2;
+		if (RodillaD < 45) {
+			PiernaD -= 2;
+			RodillaD += 2;
+		}
+	}
+	else if (RotHuman < 0) {
+		RotHuman += 2;
+		if (RodillaD > 0) {
+			PiernaD += 2;
+			RodillaD -= 2;
+		}
+	}
+	else if (RodillaD > 0) {
+		PiernaD += 2;
+		RodillaD -= 2;
+	}
+	else {
+		cpz9 -= 5;
+	}
+}
+
+
+else if (cpx10 > -200.0) {
+    cpx10 -= 3;
+    if (RotHuman > -45) {
+        RotHuman -= 1;
+        if (RodillaD < 45) {
+            PiernaD -= 1;
+            RodillaD += 1;
+        }
+    }
+} 
+else if (cpz10 > -500.0) {
+	if (cpz10 > -490) {
+		cpz10 -= 5;
+		if (RotHuman > -90) {
+			RotHuman -= 2;
+			if (RodillaD > 0) {
+				PiernaD += 2;
+				RodillaD -= 2;
+			}
+		}
+	}
+	else if (RotHuman < -45) {
+		RotHuman += 2;
+		if (RodillaD < 45) {
+			PiernaD -= 2;
+			RodillaD += 2;
+		}
+	}
+	else if (RotHuman < 0) {
+		RotHuman += 2;
+		if (RodillaD > 0) {
+			PiernaD += 2;
+			RodillaD -= 2;
+		}
+	}
+	else if (RodillaD > 0) {
+		PiernaD += 2;
+		RodillaD -= 2;
+	}
+	else {
+		cpz10 -= 5;
+	}
+}
+
+
+else if (cpx11 > -200.0) {
+    cpx11 -= 3;
+    if (RotHuman > -45) {
+        RotHuman -= 1;
+        if (RodillaD < 45) {
+            PiernaD -= 1;
+            RodillaD += 1;
+        }
+    }
+}
+else if (cpz11 > -500.0) {
+	if (cpz11 > -490) {
+		cpz11 -= 5;
+		if (RotHuman > -90) {
+			RotHuman -= 2;
+			if (RodillaD > 0) {
+				PiernaD += 2;
+				RodillaD -= 2;
+			}
+		}
+	}
+	else if (RotHuman < -45) {
+		RotHuman += 2;
+		if (RodillaD < 45) {
+			PiernaD -= 2;
+			RodillaD += 2;
+		}
+	}
+	else if (RotHuman < 0) {
+		RotHuman += 2;
+		if (RodillaD > 0) {
+			PiernaD += 2;
+			RodillaD -= 2;
+		}
+	}
+	else if (RodillaD > 0) {
+		PiernaD += 2;
+		RodillaD -= 2;
+	}
+	else {
+		cpz11 -= 5;
+	}
+}
+
+
+else if (cpx12 > -200.0) {
+    cpx12 -= 3;
+    if (RotHuman > -45) {
+        RotHuman -= 1;
+        if (RodillaD < 45) {
+            PiernaD -= 1;
+            RodillaD += 1;
+        }
+    }
+} 
+else if (cpz12 > -500.0) {
+	if (cpz12 > -490) {
+		cpz12 -= 5;
+		if (RotHuman > -90) {
+			RotHuman -= 2;
+			if (RodillaD > 0) {
+				PiernaD += 2;
+				RodillaD -= 2;
+			}
+		}
+	}
+	else if (RotHuman < -45) {
+		RotHuman += 2;
+		if (RodillaD < 45) {
+			PiernaD -= 2;
+			RodillaD += 2;
+		}
+	}
+	else if (RotHuman < 0) {
+		RotHuman += 2;
+		if (RodillaD > 0) {
+			PiernaD += 2;
+			RodillaD -= 2;
+		}
+	}
+	else if (RodillaD > 0) {
+		PiernaD += 2;
+		RodillaD -= 2;
+	}
+	else {
+		cpz12 -= 5;
+	}
+}
+
+
+else if (tamppizpa >0) {
+	tamppizpa -= 0.01;
+				}
+
+
 				else {
 					nuevo = 1;
 				}
-
-			
 		}
-	}
+
+}
 	else {
-			if (monitor1 < 1 && teclado1 < 1) {
+		if (tamppizpa < 1) {
+			tamppizpa += 0.01;
+				}
+			else if (monitor1 < 1 && teclado1 < 1) {
 				monitor1 += 0.02;
 				teclado1 += 0.02;
 			}
@@ -2435,32 +3086,175 @@ void Animation() {
 			}
 			else if (silla24 < 1) {
 				silla24 += 0.02;
-			}
-			else if (tiempoTexto < (contexto * 3)) {
-				tiempoTexto += 0.01;
-				tex3 = 1.0f;
-				tex1 = 0.0f;
-				tex2 = 0.0f;
-				if (musica3) {
-					PlaySound(NULL, NULL, 0);
-					PlaySound(TEXT("sonidos/hablar.wav"), NULL, SND_FILENAME | SND_ASYNC);
-					musica3 = false;
 				}
+			else if (!rackflag) {
+				rackflag = 1;
 			}
-			else if (HombroD <= 0.0f) {
-				HombroD += 0.3f;
-				HombroI += 0.3f;
-				tex3 = 0.0f;
-				if (musicafinal) {
-					PlaySound(NULL, NULL, 0);
-					PlaySound(TEXT("sonidos/final.wav"), NULL, SND_FILENAME | SND_ASYNC);
-					musicafinal = false;
+			
+		}
+		if (rackflag) {
+			if (rack11) {
+
+
+				if (rackz > -0.232) {
+					rackz -= 0.0005;
+					if (RotHuman > -45) {
+						RotHuman -= 0.15;
+						if (RodillaD < 45) {
+							PiernaD -= 0.4;
+							RodillaD += 0.4;
+						}
+					}
+					else if (RotHuman > -90) {
+						RotHuman -= 0.15;
+						if (RodillaD > 0) {
+							PiernaD += 0.4;
+							RodillaD -= 0.4;
+						}
+
+					}
+				}
+				else if (rackx > -0.090) {
+					rackx -= 0.001;
+
+				}
+				else if (rackTam > 0.7) {
+					rackTam -= 0.001;
+				}
+				else if (rackz > -0.320) {
+					rackz -= 0.0003;
+					if (RotHuman > -135) {
+						RotHuman -= 0.1;
+					}
+				}
+				else {
+					rack11 = 0;
 				}
 
 			}
+			else {
+
+				if (rackz < -0.0700) {
+					rackz += 0.0005;
+					if(RotHuman < -90) {
+						RotHuman += 0.05;
+
+					}
+
+				}
+				else if (rackTam<1) {
+					rackTam += 0.001;
+					RotHuman = -90;
+				}
+				else if (purtaRot < 0) {
+					purtaRot += 1;
+				}
+				else if (!pizzarronFlag) {
+					pizzarronFlag = 1;
+					vuelta1 = 1;
+				}
+
+			}
+		
+			
+
+		
 		}
 
 
+
+
+		if (pizzarronFlag) {
+			
+			if (vuelta1) {
+
+				if (RotHuman > -135) {
+					RotHuman -= 1;
+					if (RodillaD < 45) {
+						PiernaD -= 1;
+						RodillaD += 1;
+					}
+				}
+				else if (RotHuman > -180) {
+					RotHuman -= 1;
+					if (RodillaD > 0) {
+						PiernaD += 1;
+						RodillaD -= 1;
+					}
+
+				}
+				else {
+					vuelta1 = 0;
+					vuelta2 = 1;
+				}
+			}
+			else {
+				
+				if (vuelta2) {
+					if (tampiz > 0) {
+						brazorot -= 0.0025;
+						tampiz -= 0.005;
+					}
+					else {
+						pizzarron3 = 0;
+						vuelta2 = 0;
+					}
+
+				}
+				else {
+					if (tampiz < 1) {
+						brazorot += 0.0025;
+						tampiz += 0.005;
+					}
+					else if (RotHuman < -90) {
+						RotHuman += 1;
+						if (RodillaD < 45) {
+							PiernaD -= 2;
+							RodillaD += 2;
+						}
+					}
+					else if (RotHuman < 0) {
+						RotHuman += 1;
+						if (RodillaD > 0) {
+							PiernaD += 2;
+							RodillaD -= 2;
+						}
+					}
+					else if (RodillaD > 0) {
+						PiernaD += 2;
+						RodillaD -= 2;
+					}else if (tiempoTexto < (contexto * 3)) {
+						tiempoTexto += 0.01;
+						tex3 = 1.0f;
+						tex1 = 0.0f;
+						tex2 = 0.0f;
+						if (musica3) {
+							PlaySound(NULL, NULL, 0);
+							PlaySound(TEXT("sonidos/hablar.wav"), NULL, SND_FILENAME | SND_ASYNC);
+							musica3 = false;
+						}
+					}
+					else if (HombroD <= 0.0f) {
+						HombroD += 0.3f;
+						HombroI += 0.3f;
+						tex3 = 0.0f;
+						if (musicafinal) {
+							PlaySound(NULL, NULL, 0);
+							PlaySound(TEXT("sonidos/final.wav"), NULL, SND_FILENAME | SND_ASYNC);
+							musicafinal = false;
+						}
+
+					}
+
+
+				}
+
+
+
+				
+			}
+		}
+			
 
 
 
