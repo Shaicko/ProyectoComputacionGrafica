@@ -3020,12 +3020,12 @@ else if (tamppizpa >0) {
 
 }
 	else {
-		if (logtam < 1) {
-			logtam += 0.005;
-
-		}
-		else if (tamppizpa < 1) {
+		
+		if (tamppizpa < 1) {
 			tamppizpa += 0.01;
+				}else if (logtam < 1) {
+					logtam += 0.005;
+
 				}
 			else if (monitor1 < 1 && teclado1 < 1) {
 				monitor1 += 0.02;
@@ -3159,14 +3159,14 @@ else if (tamppizpa >0) {
 				if (rackz > -0.232) {
 					rackz -= 0.0005;
 					if (RotHuman > -45) {
-						RotHuman -= 0.25;
+						RotHuman -= 0.20;
 						if (RodillaD < 45) {
 							PiernaD -= 0.4;
 							RodillaD += 0.4;
 						}
 					}
 					else if (RotHuman > -90) {
-						RotHuman -= 0.25;
+						RotHuman -= 0.20;
 						if (RodillaD > 0) {
 							PiernaD += 0.4;
 							RodillaD -= 0.4;
@@ -3198,7 +3198,7 @@ else if (tamppizpa >0) {
 				if (rackz < -0.0700) {
 					rackz += 0.0005;
 					if(RotHuman < -90) {
-						RotHuman += 0.25;
+						RotHuman += 0.13;
 
 					}
 
