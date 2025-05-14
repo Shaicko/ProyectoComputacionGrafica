@@ -151,6 +151,10 @@ float RLegs = 0.0f;
 float head = 0.0f;
 float tail = 0.0f;
 
+int tec = 1;
+float tectam=1.0;
+float logtam = 0.0;
+
 
 float vuelta1 = 0;
 float vuelta2 = 0;
@@ -570,7 +574,13 @@ int main()
 	Model texto2((char*)"Models/texto2/model.obj");
 	Model texto3((char*)"Models/texto3/model.obj");
 
+	Model percianas((char*)"Models/blinds/blinds.obj");
 
+	Model tecl((char*)"Models/teclas/model.obj");
+
+	Model logo1((char*)"Models/huawei/huawei.obj");
+	Model logo2((char*)"Models/ciscoLogo/ciscoLogo.obj");
+	Model logo3((char*)"Models/TP-link/TP-link.obj");
 
 	////////////////////////// KEYFRAMES //////////////////////////////////
 
@@ -895,6 +905,8 @@ int main()
 		model2 = glm::mat4(1);
 		moni = glm::mat4(1);
 
+		glm::mat4 logos = glm::mat4(1);
+		glm::mat4 tecclas = glm::mat4(1);
 		glm::mat4 pivlamp = glm::mat4(1);
 		glm::mat4 lamp = glm::mat4(1);
 		glm::mat4 tecla = glm::mat4(1);
@@ -928,6 +940,16 @@ int main()
 		Salon.Draw(lightingShader);
 		/*prueba.Draw(lightingShader);*/
 		
+
+			tecclas = model;
+			tecclas = glm::translate(tecclas, glm::vec3(0.0f, 0.05f, -0.06f));
+			tecclas = glm::scale(tecclas, glm::vec3(0.07f, 0.07f, 0.07f)*tectam);
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecclas));
+			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecclas));
+			tecl.Draw(lightingShader);
+
+
 		puerta = model;
 		puerta = glm::translate(puerta, glm::vec3(-0.115f, 0.034f, -0.148f));
 		puerta = glm::rotate(puerta, glm::radians(purtaRot), glm::vec3(0, 1, 0));
@@ -936,18 +958,7 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(puerta));
 		Puer.Draw(lightingShader);
 
-		// Activa la funcionalidad para trabajar con el canal alfa (transparencia)
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelVentana));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
-		modelVentana = glm::scale(modelVentana, glm::vec3(10.0f, 9.64f, 10.0f));
-		modelVentana = glm::translate(modelVentana, glm::vec3(0.0f, 0.0f, 0.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelVentana));
-		ventanas.Draw(lightingShader);
-		glDisable(GL_BLEND);
-		glBindVertexArray(0);
-
+		
 		
 		PivTosrso = model;
 
@@ -1010,7 +1021,57 @@ int main()
 		humPieD = glm::rotate(humPieD, glm::radians(RodillaD), glm::vec3(1, 0, 0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(humPieD));
 		PieDM.Draw(lightingShader);
+		logos = model;
+		logos = glm::scale(logos, glm::vec3(0.99f, 0.99f, 0.99f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(logos));
+		percianas.Draw(lightingShader);
 
+		if (pizzarron3) {
+
+			pizarron = model;
+			pizarron = glm::scale(pizarron, glm::vec3(0.007f, 0.007f, 0.007f) * tampiz);
+			pizarron = glm::rotate(pizarron, glm::radians(180.0f), glm::vec3(.00f, -1.0f, 0.0f));
+			pizarron = glm::translate(pizarron, glm::vec3(0.0f, 6.0f, 20.0f) / tampiz);
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
+			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
+			pizarra.Draw(lightingShader);
+		}
+		else {
+			pizarron = model;
+			pizarron = glm::scale(pizarron, glm::vec3(0.012f, 0.012f, 0.012f) * tampiz);
+			pizarron = glm::rotate(pizarron, glm::radians(0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+			pizarron = glm::translate(pizarron, glm::vec3(6.5f, 1.0f, -12.5f) / tampiz);
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
+			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
+			tele.Draw(lightingShader);
+		}
+
+		if (rack11) {
+
+			// Servidor
+			rack = model;
+			rack = glm::scale(rack, glm::vec3(1.0, 1.0f, 1.0f) * rackTam);
+			rack = glm::translate(rack, glm::vec3(rackx, 0.0f, 0.130 + rackz) / rackTam);
+			rack = glm::rotate(rack, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(rack));
+			servidor.Draw(lightingShader);
+			
+
+		}
+		else {
+			// El servidor y otros objetos que se mantienen igual
+			rack2 = model;
+			rack2 = glm::scale(rack2, glm::vec3(1.0, 1.0f, 1.0f) * rackTam);
+			rack2 = glm::translate(rack2, glm::vec3(rackx, 0.0f, rackz) / rackTam);
+			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(rack2));
+			servidor2.Draw(lightingShader);
+
+
+		}
 		
 		if (!nuevo) {
 			escritorioP = model;
@@ -1550,6 +1611,23 @@ int main()
 
 		}
 		else {
+			logos = model;
+			logos = glm::scale(logos, glm::vec3(1.f, 1.0f, 1.0f) * logtam);
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(logos));
+			logo1.Draw(lightingShader);
+			logos = model;
+			logos = glm::scale(logos, glm::vec3(0.99f, 0.99f, 0.99f) * logtam);
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(logos));
+			logo2.Draw(lightingShader);
+			logos = model;
+			logos = glm::scale(logos, glm::vec3(0.99f, 0.99f, 0.99f) * logtam);
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(logos));
+			logo3.Draw(lightingShader);
+
+			
+			
+
+
 			escritorioP = model;
 			escritorioP = glm::scale(escritorioP, glm::vec3(1.f, 1.0f * tamppizpa, 1.0f));
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(escritorioP));
@@ -1978,51 +2056,34 @@ int main()
 
 			
 		}
-
-		if (pizzarron3) {
-
-			pizarron = model;
-			pizarron = glm::scale(pizarron, glm::vec3(0.007f, 0.007f , 0.007f) * tampiz);
-			pizarron = glm::rotate(pizarron, glm::radians(180.0f), glm::vec3(.00f, -1.0f, 0.0f));
-			pizarron = glm::translate(pizarron, glm::vec3(0.0f, 6.0f, 20.0f) / tampiz);
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
-			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
-			pizarra.Draw(lightingShader);
-		}
-		else {
-			pizarron = model;
-			pizarron = glm::scale(pizarron, glm::vec3(0.012f, 0.012f, 0.012f) * tampiz);
-			pizarron = glm::rotate(pizarron, glm::radians(0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-			pizarron = glm::translate(pizarron, glm::vec3(6.5f, 1.0f, -12.5f) / tampiz);
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
-			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pizarron));
-			tele.Draw(lightingShader);
-		}
-
 		if (rack11) {
-			
-			// Servidor
-			rack = model;
-			rack = glm::scale(rack, glm::vec3(1.0, 1.0f, 1.0f) * rackTam);
-			rack = glm::translate(rack, glm::vec3(rackx, 0.0f,0.136 +rackz)/rackTam);
-			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(rack));
-			servidor.Draw(lightingShader);
-
+			if (humoflag) {
+				for (int i = 0; i <= 3; i++) {
+					hum = rack;
+					glEnable(GL_BLEND);//Activa la funcionalidad para trabajar el canal alfa
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+					hum = glm::scale(hum, H[i].size);
+					hum = glm::translate(hum, H[i].position);
+					hum = glm::rotate(hum, glm::radians(rhumo), glm::vec3(0.0f, 1.0f, 0.0f));
+					glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(hum));
+					glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
+					glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(hum));
+					humo.Draw(lightingShader);
+					glDisable(GL_BLEND);
+				}
+			}
 		}
-		else {
-			// El servidor y otros objetos que se mantienen igual
-			rack2 = model;
-			rack2 = glm::scale(rack2, glm::vec3(1.0, 1.0f, 1.0f)*rackTam);
-			rack2 = glm::translate(rack2, glm::vec3(rackx, 0.0f, rackz)/rackTam);
-				glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(rack2));
-			servidor2.Draw(lightingShader);
-			
-
-		}
+		// Activa la funcionalidad para trabajar con el canal alfa (transparencia)
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelVentana));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
+		modelVentana = glm::scale(modelVentana, glm::vec3(10.0f, 9.64f, 10.0f));
+		modelVentana = glm::translate(modelVentana, glm::vec3(0.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelVentana));
+		ventanas.Draw(lightingShader);
+		glDisable(GL_BLEND);
+		glBindVertexArray(0);
 
 		glBindVertexArray(0);
 
@@ -2086,74 +2147,40 @@ int main()
 // Moves/alters the camera positions based on user input
 void DoMovement()
 {
+	if (!tec) {
 
-	// Camera controls
-	if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP])
-	{
-		camera.ProcessKeyboard(FORWARD, deltaTime);
+		// Camera controls
+		if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP])
+		{
+			camera.ProcessKeyboard(FORWARD, deltaTime);
 
-	}
+		}
 
-	if (keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN])
-	{
-		camera.ProcessKeyboard(BACKWARD, deltaTime);
-
-
-	}
-
-	if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT])
-	{
-		camera.ProcessKeyboard(LEFT, deltaTime);
+		if (keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN])
+		{
+			camera.ProcessKeyboard(BACKWARD, deltaTime);
 
 
-	}
+		}
 
-	if (keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT])
-	{
-		camera.ProcessKeyboard(RIGHT, deltaTime);
-
-
-	}
+		if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT])
+		{
+			camera.ProcessKeyboard(LEFT, deltaTime);
 
 
+		}
 
-	if (keys[GLFW_KEY_T])
-	{
-		mx += 0.01f;
-	}
-	if (keys[GLFW_KEY_G])
-	{
-		mx -= 0.01f;
-	}
+		if (keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT])
+		{
+			camera.ProcessKeyboard(RIGHT, deltaTime);
 
-	if (keys[GLFW_KEY_Y])
-	{
-		my += 0.01f;
-	}
 
-	if (keys[GLFW_KEY_H])
-	{
-		my -= 0.01f;
-	}
-	if (keys[GLFW_KEY_U])
-	{
-		mz -= 0.01f;
-	}
-	if (keys[GLFW_KEY_J])
-	{
-		mz += 0.01f;
-	}
+		}
 
 	
 	
-
-	if (keys[GLFW_KEY_O])
-	{
-		printf("%f,%f,%f \n", mx,my, mz);
-		
 	}
 
-	
 
 }
 void falsos() {
@@ -2200,11 +2227,25 @@ void falsos() {
 	rackflag = 0;
 	rackx = 0;
 	rackz = 0;
+	logtam = 0.0;
 
 }
 // Is called whenever a key is pressed/released via GLFW
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
+	if (tec) {
+
+		for (int key = GLFW_KEY_SPACE; key < GLFW_KEY_LAST; ++key) {
+			if (glfwGetKey(window, key) == GLFW_PRESS) {
+				// Si cualquier tecla está siendo presionada
+				tec = 0;
+			}
+		}
+
+
+	}
+	else {
+
 	if (keys[GLFW_KEY_L])
 	{
 		if (play == false && (FrameIndex > 1))
@@ -2225,6 +2266,13 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 			play = false;
 		}
 
+	}
+
+	for (int key = GLFW_KEY_SPACE; key < GLFW_KEY_LAST; ++key) {
+		if (glfwGetKey(window, key) == GLFW_PRESS) {
+			// Si cualquier tecla está siendo presionada
+
+		}
 	}
 
 
@@ -2265,7 +2313,9 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 			keys[key] = false;
 		}
 	}
-}
+
+	}
+	}
 void verdaderos() {
 	hablar = true;
 	musica1 = true;
@@ -2276,7 +2326,12 @@ void verdaderos() {
 }
 
 void Animation() {
-	
+	if (!tec) {
+		if (tectam > 0) {
+
+			tectam -= 0.05;
+		}
+	}
 	if (!nuevo) {
 		if (monitores) {
 			if (musicaCambio) {
@@ -2964,8 +3019,12 @@ else if (tamppizpa >0) {
 
 }
 	else {
+		
 		if (tamppizpa < 1) {
 			tamppizpa += 0.01;
+				}else if (logtam < 1) {
+					logtam += 0.005;
+
 				}
 			else if (monitor1 < 1 && teclado1 < 1) {
 				monitor1 += 0.02;
@@ -3099,14 +3158,14 @@ else if (tamppizpa >0) {
 				if (rackz > -0.232) {
 					rackz -= 0.0005;
 					if (RotHuman > -45) {
-						RotHuman -= 0.15;
+						RotHuman -= 0.20;
 						if (RodillaD < 45) {
 							PiernaD -= 0.4;
 							RodillaD += 0.4;
 						}
 					}
 					else if (RotHuman > -90) {
-						RotHuman -= 0.15;
+						RotHuman -= 0.20;
 						if (RodillaD > 0) {
 							PiernaD += 0.4;
 							RodillaD -= 0.4;
@@ -3120,11 +3179,12 @@ else if (tamppizpa >0) {
 				}
 				else if (rackTam > 0.7) {
 					rackTam -= 0.001;
+					brazorot -= 0.00125;
 				}
 				else if (rackz > -0.320) {
 					rackz -= 0.0003;
-					if (RotHuman > -135) {
-						RotHuman -= 0.1;
+					if (RotHuman > -150) {
+						RotHuman -= 0.25;
 					}
 				}
 				else {
@@ -3137,13 +3197,14 @@ else if (tamppizpa >0) {
 				if (rackz < -0.0700) {
 					rackz += 0.0005;
 					if(RotHuman < -90) {
-						RotHuman += 0.05;
+						RotHuman += 0.13;
 
 					}
 
 				}
 				else if (rackTam<1) {
 					rackTam += 0.001;
+					brazorot += 0.00125;
 					RotHuman = -90;
 				}
 				else if (purtaRot < 0) {
@@ -3485,13 +3546,14 @@ else if (tamppizpa >0) {
 	
 }
 void MouseCallback(GLFWwindow* window, double xPos, double yPos){
-	if (firstMouse)
+
+if (firstMouse)
 	{
 		lastX = xPos;
 		lastY = yPos;
 		firstMouse = false;
 	}
-
+if (!tec) {
 	GLfloat xOffset = xPos - lastX;
 	GLfloat yOffset = lastY - yPos;  // Reversed since y-coordinates go from bottom to left
 
@@ -3499,4 +3561,7 @@ void MouseCallback(GLFWwindow* window, double xPos, double yPos){
 	lastY = yPos;
 
 	camera.ProcessMouseMovement(xOffset, yOffset);
+
+	}
+	
 }
