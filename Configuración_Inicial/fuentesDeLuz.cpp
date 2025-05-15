@@ -164,7 +164,7 @@ int pizzarron3 = 1;
 
 int rackflag = 0;
 int rack11 = 1;
-float rackx=0.0f;
+float rackx=-0.01f;
 float rackz =0.0f;
 float rackTam =1.0;
 float radio = 0.0f;  // Radio del c�rculo
@@ -943,8 +943,8 @@ int main()
 		
 
 			tecclas = model;
-			tecclas = glm::translate(tecclas, glm::vec3(0.0f, 0.05f, -0.06f));
-			tecclas = glm::scale(tecclas, glm::vec3(0.07f, 0.07f, 0.07f)*tectam);
+			tecclas = glm::translate(tecclas, glm::vec3(0.0f, 0.05f, -0.02f));
+			tecclas = glm::scale(tecclas, glm::vec3(0.1f, 0.1f, 0.1f)*tectam);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecclas));
 			glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(tecclas));
@@ -2226,7 +2226,7 @@ void falsos() {
 	pizzarron3 = 1;
 	rack11 = 1;
 	rackflag = 0;
-	rackx = 0;
+	rackx = -0.01;
 	rackz = 0;
 	logtam = 0.0;
 
@@ -2236,11 +2236,9 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 {
 	if (tec) {
 
-		for (int key = GLFW_KEY_SPACE; key < GLFW_KEY_LAST; ++key) {
-			if (glfwGetKey(window, key) == GLFW_PRESS) {
-				// Si cualquier tecla está siendo presionada
+		if(key == GLFW_KEY_SPACE && GLFW_PRESS == action) {
 				tec = 0;
-			}
+			
 		}
 
 
@@ -2269,13 +2267,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 
 	}
 
-	for (int key = GLFW_KEY_SPACE; key < GLFW_KEY_LAST; ++key) {
-		if (glfwGetKey(window, key) == GLFW_PRESS) {
-			// Si cualquier tecla está siendo presionada
-
-		}
-	}
-
+	
 
 	if (keys[GLFW_KEY_K])
 	{
